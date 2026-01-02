@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Python Test Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/test.css">
+</head>
+<body onload="initTest()" onbeforeunload="confirmLeave()">
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger-btn" onclick="toggleSidebar()" title="Question Palette">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <!-- Sidebar Navigation (JEE Style) -->
+    <div class="sidebar" id="question-sidebar">
+        <div class="sidebar-header">
+            <h3>Question Palette</h3>
+            <button class="close-sidebar" onclick="toggleSidebar()">✕</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-box answered"></span>
+                <span>Answered</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-box attempted"></span>
+                <span>Attempted</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-box not-visited"></span>
+                <span>Not Visited</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-box active"></span>
+                <span>Current</span>
+            </div>
+        </div>
+        
+        <div class="question-grid" id="question-buttons"></div>
+    </div>
+    
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    
+    <div class="test-container">
+        <div class="test-header">
+            <div class="header-left">
+                <h1 id="test-title"></h1>
+            </div>
+            <div class="header-right">
+                <div class="timer-container">
+                    <span class="timer-label">Time Remaining:</span>
+                    <span id="timer" class="timer">60:00</span>
+                </div>
+                <button onclick="confirmSubmit()" class="btn btn-submit">Submit Test</button>
+            </div>
+        </div>
+        
+        <div class="test-content">
+            <div class="question-area">
+                <div id="question-display" class="anti-ocr-container"></div>
+                
+                <div class="navigation-buttons">
+                    <button id="prev-btn" onclick="previousQuestion()" class="btn btn-secondary">Previous</button>
+                    <button id="next-btn" onclick="nextQuestion()" class="btn btn-primary">Next</button>
+                    <button onclick="confirmSubmit()" class="btn btn-success">Submit Test</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="data/questions.js"></script>
+    <script src="js/protection.js"></script>
+    <script src="js/code-runner.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/test.js"></script>
+</body>
+</html>

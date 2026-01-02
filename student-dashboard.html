@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Python Test Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body onload="initStudentDashboard()">
+    <div class="container">
+        <header class="dashboard-header">
+            <h1>Student Dashboard</h1>
+            <div class="user-info">
+                <span id="user-name"></span>
+                <button onclick="logout()" class="btn btn-small">Logout</button>
+            </div>
+        </header>
+        
+        <main>
+            <div class="dashboard-content">
+                <section class="profile-section">
+                    <h2>Your Profile</h2>
+                    <div id="profile-details"></div>
+                </section>
+                
+                <section class="tests-section">
+                    <h2>Available Tests</h2>
+                    <div id="available-tests"></div>
+                </section>
+                
+                <section class="history-section">
+                    <h2>Test History</h2>
+                    <div id="test-history"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Load questions data -->
+    <script src="data/questions.js"></script>
+    
+    <script type="module">
+        import { onAuthStateChanged, signOut, isDemoUser, getDemoUser } from './js/firebase-auth.js';
+        import { getAllTests, getTestAttemptsByUser, checkUserHasAttemptedTest } from './js/firebase-database.js';
+        
+        let currentUser = null;
+        
+        async function initStudentDashboard() {
+            // Initialize test questions if available
+            if (typeof initializeTestQuestions === 'function') {
+                initializeTestQuestions();
+            }
+            
+            // Check for demo user
+            if (isDemoUser()) {
+                currentUser = getDemoUser();
+                
+                // Prevent admin from accessing student dashboard
+                if (currentUser.role === 'admin') {
+                    alert('Admins cannot access student dashboard. Redirecting to admin panel.');
+                    window.location.href = 'admin-dashboard.html';
+                    return;
+                }
+                
+                displayUserInfo();
+                await loadData();
+                return;
+            }
+            
+            // Check Firebase auth
+            onAuthStateChanged(async (user) => {
+                if (!user) {
+                    console.log('No Firebase user, redirecting to login');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Get user data from session or Firestore
+                const userJson = sessionStorage.getItem('currentUser');
+                if (userJson) {
+                    currentUser = JSON.parse(userJson);
+                    console.log('Current user from session:', currentUser);
+                } else {
+                    console.log('No user in session, redirecting to login');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Prevent admin from accessing student dashboard
+                if (currentUser.role === 'admin') {
+                    console.log('Admin user detected, redirecting to admin panel');
+                    alert('Admins cannot access student dashboard. Redirecting to admin panel.');
+                    window.location.href = 'admin-dashboard.html';
+                    return;
+                }
+                
+                displayUserInfo();
+                await loadData();
+            });
+        }
+        
+        function displayUserInfo() {
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('profile-details').innerHTML = `
+                <p><strong>Email:</strong> ${currentUser.email}</p>
+                <p><strong>Department:</strong> ${currentUser.department || 'N/A'}</p>
+                <p><strong>WhatsApp:</strong> ${currentUser.whatsapp || 'N/A'}</p>
+            `;
+        }
+        
+        async function loadData() {
+            await loadAvailableTests();
+            await loadTestHistory();
+        }
+        
+        async function loadAvailableTests() {
+            const tests = await getAllTests();
+            const container = document.getElementById('available-tests');
+            
+            if (tests.length === 0) {
+                container.innerHTML = '<p class="no-data">No tests available at this time.</p>';
+                return;
+            }
+            
+            const html = [];
+            for (const test of tests) {
+                const canStart = await canStartTest(test);
+                const hasAttempted = await checkUserHasAttemptedTest(currentUser.email, test.id);
+                
+                html.push(`
+                    <div class="test-card">
+                        <h3>${test.title}</h3>
+                        <p>${test.description}</p>
+                        <p><strong>Duration:</strong> ${test.duration} minutes</p>
+                        <p><strong>Available:</strong> ${test.startDate} to ${test.endDate}</p>
+                        <p><strong>Questions:</strong> ${test.questions ? test.questions.length : 0}</p>
+                        ${hasAttempted ? 
+                            '<p class="status-text" style="color: #ffc107;">Already attempted</p>' :
+                            canStart ? 
+                                `<button onclick="startTest('${test.id}')" class="btn btn-primary">Start Test</button>` :
+                                '<p class="status-text">Test not available</p>'
+                        }
+                    </div>
+                `);
+            }
+            
+            container.innerHTML = html.join('');
+        }
+        
+        async function canStartTest(test) {
+            const now = new Date();
+            const start = new Date(test.startDate);
+            const end = new Date(test.endDate);
+            return now >= start && now <= end;
+        }
+        
+        async function loadTestHistory() {
+            const attempts = await getTestAttemptsByUser(currentUser.email);
+            const container = document.getElementById('test-history');
+            
+            if (attempts.length === 0) {
+                container.innerHTML = '<p class="no-data">No test attempts yet.</p>';
+                return;
+            }
+            
+            // Convert Firestore timestamps if needed
+            const formattedAttempts = attempts.map(a => ({
+                ...a,
+                startTime: a.startTime?.toMillis ? a.startTime.toMillis() : a.startTime,
+                submitTime: a.submitTime?.toMillis ? a.submitTime.toMillis() : a.submitTime
+            }));
+            
+            container.innerHTML = `
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Test</th>
+                            <th>Start Time</th>
+                            <th>Submit Time</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${formattedAttempts.map(attempt => `
+                            <tr>
+                                <td>${attempt.testTitle}</td>
+                                <td>${new Date(attempt.startTime).toLocaleString()}</td>
+                                <td>${new Date(attempt.submitTime).toLocaleString()}</td>
+                                <td>${attempt.totalScore}/${attempt.maxScore}</td>
+                                <td>${attempt.autoSubmitted ? 'Auto-Submitted' : 'Submitted'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        window.startTest = async function(testId) {
+            const hasAttempted = await checkUserHasAttemptedTest(currentUser.email, testId);
+            
+            if (hasAttempted) {
+                alert('You have already attempted this test.');
+                return;
+            }
+            
+            window.location.href = `test.html?testId=${testId}`;
+        };
+        
+        window.logout = async function() {
+            if (isDemoUser()) {
+                sessionStorage.removeItem('demoUser');
+            } else {
+                await signOut();
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        };
+        
+        // Initialize on load
+        initStudentDashboard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Start Guide - Python Test Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e1e8ed;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        code {
+            background: #282c34;
+            color: #61dafb;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e1e8ed;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Quick Start Guide</h1>
+        <p style="font-size: 1.1rem; color: #666; margin-bottom: 20px;">
+            Get your Python Test Platform up and running in minutes!
+        </p>
+        
+        <div class="info">
+            <strong>📝 Note:</strong> This platform runs entirely in your browser. No server setup required for basic testing!
+        </div>
+        
+        <h2>Method 1: Instant Demo (Easiest)</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Open index.html</strong>
+            <p>Simply double-click <code>index.html</code> to open in your browser.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Navigate to Login</strong>
+            <p>Click "Get Started" or "Admin Login" on the homepage.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Use Demo Login</strong>
+            <p>Click either:</p>
+            <ul>
+                <li><strong>Student Demo</strong> - Access student dashboard and take tests</li>
+                <li><strong>Admin Demo</strong> - Access admin panel and manage tests</li>
+            </ul>
+        </div>
+        
+        <div class="success">
+            <strong>✅ That's it!</strong> You're now ready to explore the platform.
+        </div>
+        
+        <h2>Method 2: Local Web Server (Recommended)</h2>
+        
+        <p>For full functionality including Google OAuth, run a local web server:</p>
+        
+        <h3>Option A: Python HTTP Server</h3>
+        <pre><code># Navigate to project folder
+cd "Python Test"
+
+# Python 3
+python -m http.server 8000
+
+# OR Python 2
+python -m SimpleHTTPServer 8000</code></pre>
+        
+        <p>Then open: <code>http://localhost:8000</code></p>
+        
+        <h3>Option B: Node.js HTTP Server</h3>
+        <pre><code># Install (one time)
+npm install -g http-server
+
+# Run server
+http-server -p 8000</code></pre>
+        
+        <p>Then open: <code>http://localhost:8000</code></p>
+        
+        <h3>Option C: VS Code Live Server</h3>
+        <ol>
+            <li>Install "Live Server" extension in VS Code</li>
+            <li>Right-click on <code>index.html</code></li>
+            <li>Select "Open with Live Server"</li>
+        </ol>
+        
+        <h2>First Time Setup</h2>
+        
+        <h3>For Students</h3>
+        <ol>
+            <li>Click "Get Started" on homepage</li>
+            <li>Use Demo Login or sign in with Google</li>
+            <li>Provide department and WhatsApp number (first time only)</li>
+            <li>Access your dashboard</li>
+            <li>Click "Start Test" on available tests</li>
+        </ol>
+        
+        <h3>For Admins</h3>
+        <ol>
+            <li>Click "Admin Login" on homepage</li>
+            <li>Use Admin Demo credentials</li>
+            <li>View students, test attempts, or manage tests</li>
+            <li>Export results as CSV if needed</li>
+        </ol>
+        
+        <h2>Default Credentials</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th>Access Method</th>
+                    <th>Capabilities</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Student</strong></td>
+                    <td>Click "Student Demo" button</td>
+                    <td>Take tests, view scores, see history</td>
+                </tr>
+                <tr>
+                    <td><strong>Admin</strong></td>
+                    <td>Click "Admin Demo" button</td>
+                    <td>View students, manage tests, export data</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Taking Your First Test</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Login as Student</strong>
+            <p>Use Student Demo login</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Start the Test</strong>
+            <p>Click "Start Test" on "Python Basics Test"</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Write Code</strong>
+            <p>Write your solution in the code editor</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>Run & Test</strong>
+            <p>Click "Run Code" to test against test cases</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">5</span>
+            <strong>Submit</strong>
+            <p>Complete all questions and click "Submit Test"</p>
+        </div>
+        
+        <h2>Key Features</h2>
+        
+        <ul>
+            <li><strong>⏱️ 60-Minute Timer:</strong> Auto-submits when time expires</li>
+            <li><strong>🔒 Copy-Paste Protection:</strong> Prevents cheating</li>
+            <li><strong>✅ Instant Validation:</strong> Run code against test cases</li>
+            <li><strong>📊 Detailed Results:</strong> Question-wise scores and overall marks</li>
+            <li><strong>📱 Responsive Design:</strong> Works on desktop and tablets</li>
+            <li><strong>💾 Auto-Save:</strong> Answers saved as you type</li>
+        </ul>
+        
+        <h2>Sample Questions Included</h2>
+        
+        <ol>
+            <li><strong>Sum of List</strong> - Calculate sum of numbers (10 marks)</li>
+            <li><strong>Palindrome Check</strong> - Verify if string is palindrome (15 marks)</li>
+            <li><strong>Fibonacci Sequence</strong> - Generate Fibonacci numbers (20 marks)</li>
+            <li><strong>Count Vowels</strong> - Count vowels in a string (15 marks)</li>
+            <li><strong>Find Max/Min</strong> - Find maximum and minimum (10 marks)</li>
+        </ol>
+        
+        <h2>Troubleshooting</h2>
+        
+        <h3>Issue: Code doesn't run</h3>
+        <div class="warning">
+            <strong>Solution:</strong> Wait a few seconds for Pyodide to load (first time only). Check internet connection as Pyodide loads from CDN.
+        </div>
+        
+        <h3>Issue: Google Login not working</h3>
+        <div class="warning">
+            <strong>Solution:</strong> Use Demo Login buttons instead. For production, set up Google OAuth credentials.
+        </div>
+        
+        <h3>Issue: Data disappears after closing browser</h3>
+        <div class="warning">
+            <strong>Solution:</strong> Don't use incognito/private mode. LocalStorage is cleared when browser closes in private mode.
+        </div>
+        
+        <h3>Issue: Timer not working</h3>
+        <div class="warning">
+            <strong>Solution:</strong> Check browser console for errors. Ensure JavaScript is enabled.
+        </div>
+        
+        <h2>Next Steps</h2>
+        
+        <ul>
+            <li>📖 Read the full <code>README.md</code> for detailed documentation</li>
+            <li>🎨 Customize colors and styling in CSS files</li>
+            <li>📝 Add your own questions in <code>data/questions.js</code></li>
+            <li>🔧 Set up Google OAuth for production use</li>
+            <li>🗄️ Consider adding backend for persistent storage</li>
+        </ul>
+        
+        <div class="info">
+            <strong>💡 Pro Tip:</strong> Open browser DevTools (F12) and check the Console tab for any errors or warnings while testing.
+        </div>
+        
+        <h2>File Structure Overview</h2>
+        
+        <pre><code>Python Test/
+├── index.html              # Landing page - START HERE
+├── login.html              # Login page
+├── student-dashboard.html  # Student interface
+├── test.html              # Test taking interface
+├── admin-dashboard.html   # Admin panel
+├── css/                   # Styling files
+├── js/                    # JavaScript logic
+└── data/                  # Questions database</code></pre>
+        
+        <h2>Quick Commands Reference</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Command/Steps</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Start Python Server</td>
+                    <td><code>python -m http.server 8000</code></td>
+                </tr>
+                <tr>
+                    <td>Start Node Server</td>
+                    <td><code>http-server -p 8000</code></td>
+                </tr>
+                <tr>
+                    <td>Clear All Data</td>
+                    <td>Browser Console: <code>localStorage.clear()</code></td>
+                </tr>
+                <tr>
+                    <td>View Stored Data</td>
+                    <td>Browser DevTools → Application → Local Storage</td>
+                </tr>
+                <tr>
+                    <td>Test Student Login</td>
+                    <td>Click "Student Demo" button on login page</td>
+                </tr>
+                <tr>
+                    <td>Test Admin Login</td>
+                    <td>Click "Admin Demo" button on login page</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="success" style="margin-top: 30px;">
+            <h3 style="margin-top: 0;">🎉 Ready to Go!</h3>
+            <p>You now have everything you need to start using the Python Test Platform. If you encounter any issues, check the README.md file or browser console for error messages.</p>
+        </div>
+        
+        <a href="index.html" class="btn">Go to Platform →</a>
+    </div>
+</body>
+</html>

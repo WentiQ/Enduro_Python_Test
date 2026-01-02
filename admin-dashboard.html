@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Python Test Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body onload="initAdminDashboard()">
+    <div class="container">
+        <header class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <div class="user-info">
+                <span id="admin-name"></span>
+                <button onclick="logout()" class="btn btn-small">Logout</button>
+            </div>
+        </header>
+        
+        <main>
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showTab('students')">Students</button>
+                <button class="tab-btn" onclick="showTab('attempts')">Test Attempts</button>
+                <button class="tab-btn" onclick="showTab('tests')">Manage Tests</button>
+            </div>
+            
+            <div id="students-tab" class="tab-content active">
+                <h2>Registered Students</h2>
+                <div class="filters">
+                    <input type="text" id="student-search" placeholder="Search by name or email..." onkeyup="filterStudents()">
+                    <select id="dept-filter" onchange="filterStudents()">
+                        <option value="">All Departments</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Mechanical">Mechanical</option>
+                        <option value="Civil">Civil</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div id="students-list"></div>
+            </div>
+            
+            <div id="attempts-tab" class="tab-content">
+                <h2>Test Attempts</h2>
+                <div class="filters">
+                    <input type="text" id="attempt-search" placeholder="Search by student email..." onkeyup="filterAttempts()">
+                    <select id="test-filter" onchange="filterAttempts()">
+                        <option value="">All Tests</option>
+                    </select>
+                </div>
+                <div id="attempts-list"></div>
+            </div>
+            
+            <div id="tests-tab" class="tab-content">
+                <h2>Manage Tests</h2>
+                <button onclick="showAddTestForm()" class="btn btn-primary">Add New Test</button>
+                <button onclick="reinitializeTests()" class="btn btn-secondary" style="margin-left: 10px;">Reinitialize Enduro Test</button>
+                <div id="tests-list"></div>
+                <div id="add-test-form" style="display:none;">
+                    <h3>Add New Test</h3>
+                    <form onsubmit="saveTest(event)">
+                        <div class="form-group">
+                            <label>Test Title:</label>
+                            <input type="text" id="test-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea id="test-desc" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (minutes):</label>
+                            <input type="number" id="test-duration" min="1" value="60" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Start Date:</label>
+                            <input type="date" id="test-start" required>
+                        </div>
+                        <div class="form-group">
+                            <label>End Date:</label>
+                            <input type="date" id="test-end" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Save Test</button>
+                        <button type="button" onclick="hideAddTestForm()" class="btn btn-secondary">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Load questions data -->
+    <script src="data/questions.js"></script>
+    
+    <script type="module">
+        import { onAuthStateChanged, signOut, isDemoUser, getDemoUser } from './js/firebase-auth.js';
+        import { getAllUsers, getUsersByRole, getAllTests, getAllTestAttempts, createTest, updateTest, deleteTest } from './js/firebase-database.js';
+        
+        let currentUser = null;
+        
+        async function initAdminDashboard() {
+            // Check for demo user
+            if (isDemoUser()) {
+                currentUser = getDemoUser();
+                
+                // Ensure user is admin
+                if (currentUser.role !== 'admin') {
+                    alert('Access denied. Admin credentials required.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                document.getElementById('admin-name').textContent = currentUser.name;
+                showTab('students');
+                return;
+            }
+            
+            // Check Firebase auth
+            onAuthStateChanged(async (user) => {
+                if (!user) {
+                    console.log('No Firebase user, redirecting to login');
+                    window.location.href = 'login.html?admin=true';
+                    return;
+                }
+                
+                // Get user data from session
+                const userJson = sessionStorage.getItem('currentUser');
+                if (userJson) {
+                    currentUser = JSON.parse(userJson);
+                    console.log('Current admin user:', currentUser);
+                } else {
+                    console.log('No user in session, redirecting to login');
+                    window.location.href = 'login.html?admin=true';
+                    return;
+                }
+                
+                // Ensure user is admin
+                if (currentUser.role !== 'admin') {
+                    console.log('User is not admin, redirecting');
+                    alert('Access denied. Admin credentials required.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                document.getElementById('admin-name').textContent = currentUser.name;
+                showTab('students');
+            });
+        }
+        
+        window.logout = async function() {
+            if (isDemoUser()) {
+                sessionStorage.removeItem('demoUser');
+            } else {
+                await signOut();
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        };
+        
+        // Load the admin.js functionality
+        const script = document.createElement('script');
+        script.src = 'js/admin.js';
+        document.body.appendChild(script);
+        
+        // Initialize test questions
+        if (typeof initializeTestQuestions === 'function') {
+            initializeTestQuestions();
+        }
+        
+        // Initialize on load
+        initAdminDashboard();
+    </script>
+</body>
+</html>
