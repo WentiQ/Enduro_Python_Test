@@ -22,6 +22,14 @@
                 Sign in with Google
             </button>
             
+            <div class="auth-divider">
+                <span>OR</span>
+            </div>
+            
+            <button id="demo-login-btn" class="btn btn-secondary" style="width: 100%;">
+                Demo Login (Testing Only)
+            </button>
+            
             <div id="additional-info" style="display:none;">
                 <h3>Additional Information Required</h3>
                 <form id="user-info-form">
@@ -68,6 +76,11 @@
         
         // Google Sign-In button
         document.getElementById('google-signin-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('google-signin-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Signing in...';
+            
             try {
                 const result = await signInWithGoogle();
                 console.log('Login result:', result); // Debug log
@@ -76,6 +89,8 @@
                     // New user - only allow student registration
                     if (isAdminLogin) {
                         alert('Admin account not found. New users can only register as students. Please contact the administrator to get admin access.');
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
                         return;
                     }
                     
@@ -89,17 +104,23 @@
                     
                     document.getElementById('additional-info').style.display = 'block';
                     document.getElementById('login-message').textContent = 'Please provide additional information';
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
                 } else {
                     // Existing user - check role
                     console.log('User role:', result.role, 'Admin login?', isAdminLogin);
                     
                     if (isAdminLogin && result.role !== 'admin') {
                         alert('Access denied. This account is not registered as an administrator. Please use student login or contact the administrator.');
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
                         return;
                     }
                     
                     if (!isAdminLogin && result.role === 'admin') {
                         alert('This is an administrator account. Please use "Admin Login" button from the homepage.');
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
                         return;
                     }
                     
@@ -117,7 +138,40 @@
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                alert('Login failed. Please try again. Error: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                
+                if (error.code === 'auth/unauthorized-domain') {
+                    alert('Firebase Error: This domain is not authorized. Please add it to Firebase Console > Authentication > Settings > Authorized domains. For now, use Demo Login to test the application.');
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    // User closed the popup, no need to show error
+                } else {
+                    alert('Login failed: ' + error.message + '\n\nYou can use Demo Login for testing.');
+                }
+            }
+        });
+        
+        // Demo Login button
+        document.getElementById('demo-login-btn').addEventListener('click', () => {
+            const demoUser = {
+                uid: 'demo_' + Date.now(),
+                email: isAdminLogin ? 'admin@demo.com' : 'student@demo.com',
+                name: isAdminLogin ? 'Demo Admin' : 'Demo Student',
+                role: isAdminLogin ? 'admin' : 'student',
+                department: 'Demo Department',
+                whatsapp: '+1234567890',
+                picture: 'https://via.placeholder.com/150'
+            };
+            
+            // Store in sessionStorage
+            sessionStorage.setItem('currentUser', JSON.stringify(demoUser));
+            sessionStorage.setItem('demoMode', 'true');
+            
+            // Redirect
+            if (isAdminLogin) {
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                window.location.href = 'student-dashboard.html';
             }
         });
         
