@@ -194,6 +194,14 @@ function displayAttempts(attempts) {
     // Sort by submit time (newest first)
     attempts.sort((a, b) => b.submitTime - a.submitTime);
     
+    // Determine max questions across all attempts for dynamic columns
+    const maxQuestions = Math.max(...attempts.map(a => a.questionScores?.length || 0), 12);
+    
+    // Generate question column headers
+    const questionHeaders = Array.from({length: maxQuestions}, (_, i) => 
+        `<th>Q${i+1}</th>`
+    ).join('');
+    
     container.innerHTML = `
         <button class="export-btn" onclick="exportAttempts()">📥 Export to CSV</button>
         <table class="attempts-table">
@@ -207,6 +215,7 @@ function displayAttempts(attempts) {
                     <th>Start Time</th>
                     <th>Submit Time</th>
                     <th>Duration</th>
+                    ${questionHeaders}
                     <th>Score</th>
                     <th>Status</th>
                     <th>Details</th>
@@ -218,6 +227,17 @@ function displayAttempts(attempts) {
                                       attempt.percentage >= 40 ? 'score-medium' : 'score-poor';
                     const statusClass = attempt.autoSubmitted ? 'status-auto' : 'status-submitted';
                     
+                    // Generate individual question marks cells
+                    const questionCells = Array.from({length: maxQuestions}, (_, i) => {
+                        if (attempt.questionScores && attempt.questionScores[i]) {
+                            const qs = attempt.questionScores[i];
+                            const qScoreClass = qs.score === qs.maxScore ? 'score-good' : 
+                                               qs.score >= qs.maxScore * 0.5 ? 'score-medium' : 'score-poor';
+                            return `<td class="${qScoreClass}" style="text-align: center;">${qs.score}/${qs.maxScore}</td>`;
+                        }
+                        return `<td style="text-align: center;">-</td>`;
+                    }).join('');
+                    
                     return `
                         <tr>
                             <td>${attempt.userName}</td>
@@ -228,6 +248,7 @@ function displayAttempts(attempts) {
                             <td>${new Date(attempt.startTime).toLocaleString()}</td>
                             <td>${new Date(attempt.submitTime).toLocaleString()}</td>
                             <td>${attempt.elapsedMinutes} min</td>
+                            ${questionCells}
                             <td class="${scoreClass}">
                                 ${attempt.totalScore}/${attempt.maxScore}
                                 <br><small>(${attempt.percentage}%)</small>
@@ -331,22 +352,38 @@ function exportAttempts() {
         return;
     }
     
-    // Create CSV content
-    const headers = ['Student Name', 'Email', 'Department', 'WhatsApp', 'Test', 'Start Time', 'Submit Time', 'Duration (min)', 'Score', 'Max Score', 'Percentage', 'Status'];
-    const rows = attempts.map(a => [
-        a.userName,
-        a.userEmail,
-        a.department || 'N/A',
-        a.whatsapp || 'N/A',
-        a.testTitle,
-        new Date(a.startTime).toLocaleString(),
-        new Date(a.submitTime).toLocaleString(),
-        a.elapsedMinutes,
-        a.totalScore,
-        a.maxScore,
-        a.percentage + '%',
-        a.autoSubmitted ? 'Auto-Submitted' : 'Submitted'
-    ]);
+    // Determine max questions across all attempts
+    const maxQuestions = Math.max(...attempts.map(a => a.questionScores?.length || 0), 12);
+    
+    // Create CSV headers with individual question columns
+    const questionHeaders = Array.from({length: maxQuestions}, (_, i) => `Q${i+1} Score`);
+    const headers = ['Student Name', 'Email', 'Department', 'WhatsApp', 'Test', 'Start Time', 'Submit Time', 'Duration (min)', ...questionHeaders, 'Total Score', 'Max Score', 'Percentage', 'Status'];
+    
+    const rows = attempts.map(a => {
+        // Create question scores array
+        const questionScores = Array.from({length: maxQuestions}, (_, i) => {
+            if (a.questionScores && a.questionScores[i]) {
+                return `${a.questionScores[i].score}/${a.questionScores[i].maxScore}`;
+            }
+            return '-';
+        });
+        
+        return [
+            a.userName,
+            a.userEmail,
+            a.department || 'N/A',
+            a.whatsapp || 'N/A',
+            a.testTitle,
+            new Date(a.startTime).toLocaleString(),
+            new Date(a.submitTime).toLocaleString(),
+            a.elapsedMinutes,
+            ...questionScores,
+            a.totalScore,
+            a.maxScore,
+            a.percentage + '%',
+            a.autoSubmitted ? 'Auto-Submitted' : 'Submitted'
+        ];
+    });
     
     let csv = headers.join(',') + '\n';
     rows.forEach(row => {
@@ -382,11 +419,15 @@ function loadTests() {
     
     container.innerHTML = `
         <div class="tests-grid">
-            ${tests.map(test => `
+            ${tests.map(test => {
+                const topics = test.questions && test.questions.length > 0 ? 
+                    Array.from(new Set(window.testMetadata?.topics || ['Python Basics'])) : ['Python Basics'];
+                return `
                 <div class="test-card-admin">
                     <h3>${test.title}</h3>
-                    <p>${test.description}</p>
                     <p><strong>Duration:</strong> ${test.duration} minutes</p>
+                    <p><strong>Total Marks:</strong> ${test.totalMarks || 'N/A'}</p>
+                    <p><strong>Topics:</strong> ${topics.join(', ')}</p>
                     <p><strong>Available:</strong> ${test.startDate} to ${test.endDate}</p>
                     <div class="test-meta">
                         <span>${test.questions ? test.questions.length : 0} questions</span>
@@ -397,7 +438,7 @@ function loadTests() {
                         <button class="btn-delete" onclick="deleteTest('${test.id}')">Delete</button>
                     </div>
                 </div>
-            `).join('')}
+            `}).join('')}
         </div>
     `;
 }

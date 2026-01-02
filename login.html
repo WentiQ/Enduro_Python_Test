@@ -26,6 +26,10 @@
                 <h3>Additional Information Required</h3>
                 <form id="user-info-form">
                     <div class="form-group">
+                        <label for="name">Full Name:</label>
+                        <input type="text" id="name" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
                         <label for="department">Department:</label>
                         <select id="department" required>
                             <option value="">Select Department</option>
@@ -47,12 +51,6 @@
             
             <div class="back-link">
                 <a href="index.html">← Back to Home</a>
-            </div>
-            
-            <div id="demo-logins" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                <p style="font-weight: 600; margin-bottom: 10px; color: #666;">Demo Access (for testing):</p>
-                <button id="student-demo-btn" class="btn btn-primary" style="margin-right: 10px;">Student Demo</button>
-                <button id="admin-demo-btn" class="btn btn-secondary">Admin Demo</button>
             </div>
         </div>
     </div>
@@ -128,12 +126,13 @@
             e.preventDefault();
             
             const tempUser = JSON.parse(sessionStorage.getItem('tempUser'));
+            const name = document.getElementById('name').value;
             const department = document.getElementById('department').value;
             const whatsapp = document.getElementById('whatsapp').value;
             
             const userData = {
                 email: tempUser.email,
-                name: tempUser.name,
+                name: name,
                 picture: tempUser.picture,
                 department: department,
                 whatsapp: whatsapp,
@@ -150,27 +149,6 @@
             } catch (error) {
                 console.error('Error creating user:', error);
                 alert('Failed to create account. Please try again.');
-            }
-        });
-        
-        // Demo login buttons
-        document.getElementById('student-demo-btn').addEventListener('click', async () => {
-            try {
-                const demoUser = await demoLogin('student');
-                sessionStorage.setItem('currentUser', JSON.stringify(demoUser));
-                window.location.href = 'student-dashboard.html';
-            } catch (error) {
-                alert('Demo login failed.');
-            }
-        });
-        
-        document.getElementById('admin-demo-btn').addEventListener('click', async () => {
-            try {
-                const demoUser = await demoLogin('admin');
-                sessionStorage.setItem('currentUser', JSON.stringify(demoUser));
-                window.location.href = 'admin-dashboard.html';
-            } catch (error) {
-                alert('Demo login failed.');
             }
         });
     </script>

@@ -353,6 +353,7 @@
 #code-editor {
     width: 100%;
     min-height: 300px;
+    max-height: 600px;
     font-family: 'Courier New', monospace;
     font-size: 14px;
     padding: 15px;
@@ -362,6 +363,8 @@
     color: #abb2bf;
     resize: vertical;
     line-height: 1.5;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 #code-editor:focus {

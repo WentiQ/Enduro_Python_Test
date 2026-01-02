@@ -60,8 +60,8 @@ function initTest() {
     // Set test title
     document.getElementById('test-title').textContent = currentTest.title;
     
-    // Initialize timer
-    initTimer(currentTest.duration);
+    // Timer will be initialized after camera permission is granted
+    // initTimer will be called from activateCameraAndStart()
     
     // Generate question navigation
     generateQuestionNav();
@@ -173,13 +173,32 @@ function showQuestion(index) {
     // Set user watermark
     setUserWatermark();
     
-    // Disable copy-paste on code editor
+    // Disable copy-paste on code editor and add auto-resize
     setTimeout(() => {
         const editor = document.getElementById('code-editor');
         if (editor) {
             disableCopyPaste(editor);
+            enableAutoResize(editor);
         }
     }, 100);
+}
+
+// Enable auto-resize for textarea (VSCode-like behavior)
+function enableAutoResize(textarea) {
+    // Auto-resize on input
+    textarea.addEventListener('input', function() {
+        autoResizeTextarea(this);
+    });
+    
+    // Initial resize
+    autoResizeTextarea(textarea);
+}
+
+function autoResizeTextarea(textarea) {
+    // Reset height to auto to get the correct scrollHeight
+    textarea.style.height = 'auto';
+    // Set height to scrollHeight to fit content
+    textarea.style.height = textarea.scrollHeight + 'px';
 }
 
 // Format question text removed - now using anti-OCR version below
@@ -524,8 +543,11 @@ async function activateCameraAndStart() {
         // Monitor camera status
         startCameraMonitoring();
         
+        // NOW START THE TIMER - only after camera is active
+        initTimer(currentTest.duration);
+        
         // Show success notification
-        showNotification('✓ Camera Active - Recording in progress', 'success');
+        showNotification('✓ Camera Active - Test timer started', 'success');
         
     } catch (error) {
         console.error('Camera access error:', error);

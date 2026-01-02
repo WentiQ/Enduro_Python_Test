@@ -127,13 +127,17 @@
                 const canStart = await canStartTest(test);
                 const hasAttempted = await checkUserHasAttemptedTest(currentUser.email, test.id);
                 
+                const topics = test.questions && test.questions.length > 0 ? 
+                    Array.from(new Set(window.testMetadata?.topics || ['Python Basics'])) : ['Python Basics'];
+                
                 html.push(`
                     <div class="test-card">
                         <h3>${test.title}</h3>
-                        <p>${test.description}</p>
                         <p><strong>Duration:</strong> ${test.duration} minutes</p>
-                        <p><strong>Available:</strong> ${test.startDate} to ${test.endDate}</p>
+                        <p><strong>Total Marks:</strong> ${test.totalMarks || 'N/A'}</p>
                         <p><strong>Questions:</strong> ${test.questions ? test.questions.length : 0}</p>
+                        <p><strong>Topics:</strong> ${topics.join(', ')}</p>
+                        <p><strong>Available:</strong> ${test.startDate} to ${test.endDate}</p>
                         ${hasAttempted ? 
                             '<p class="status-text" style="color: #ffc107;">Already attempted</p>' :
                             canStart ? 
