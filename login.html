@@ -63,8 +63,9 @@
         </div>
     </div>
     
-    <script type="module">
-        import { signInWithGoogle, createUser, demoLogin } from './js/firebase-auth.js';
+    <!-- Non-module script for local testing -->
+    <script>
+        console.log('Script loaded');
         
         // Check if this is admin login
         const urlParams = new URLSearchParams(window.location.search);
@@ -74,8 +75,44 @@
             document.getElementById('login-message').textContent = 'Admin Login - Please sign in';
         }
         
+        // Demo Login button (works without Firebase)
+        document.getElementById('demo-login-btn').addEventListener('click', () => {
+            console.log('Demo login clicked');
+            const demoUser = {
+                uid: 'demo_' + Date.now(),
+                email: isAdminLogin ? 'admin@demo.com' : 'student@demo.com',
+                name: isAdminLogin ? 'Demo Admin' : 'Demo Student',
+                role: isAdminLogin ? 'admin' : 'student',
+                department: 'Demo Department',
+                whatsapp: '+1234567890',
+                picture: 'https://via.placeholder.com/150'
+            };
+            
+            // Store in sessionStorage
+            sessionStorage.setItem('currentUser', JSON.stringify(demoUser));
+            sessionStorage.setItem('demoMode', 'true');
+            
+            // Redirect
+            if (isAdminLogin) {
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                window.location.href = 'student-dashboard.html';
+            }
+        });
+    </script>
+    
+    <script type="module">
+        import { signInWithGoogle, createUser, demoLogin } from './js/firebase-auth.js';
+        
+        console.log('Firebase module loaded');
+        
+        // Check if this is admin login
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAdminLogin = urlParams.get('admin') === 'true';
+        
         // Google Sign-In button
         document.getElementById('google-signin-btn').addEventListener('click', async () => {
+            console.log('Google sign-in clicked');
             const btn = document.getElementById('google-signin-btn');
             const originalText = btn.innerHTML;
             btn.disabled = true;
@@ -148,30 +185,6 @@
                 } else {
                     alert('Login failed: ' + error.message + '\n\nYou can use Demo Login for testing.');
                 }
-            }
-        });
-        
-        // Demo Login button
-        document.getElementById('demo-login-btn').addEventListener('click', () => {
-            const demoUser = {
-                uid: 'demo_' + Date.now(),
-                email: isAdminLogin ? 'admin@demo.com' : 'student@demo.com',
-                name: isAdminLogin ? 'Demo Admin' : 'Demo Student',
-                role: isAdminLogin ? 'admin' : 'student',
-                department: 'Demo Department',
-                whatsapp: '+1234567890',
-                picture: 'https://via.placeholder.com/150'
-            };
-            
-            // Store in sessionStorage
-            sessionStorage.setItem('currentUser', JSON.stringify(demoUser));
-            sessionStorage.setItem('demoMode', 'true');
-            
-            // Redirect
-            if (isAdminLogin) {
-                window.location.href = 'admin-dashboard.html';
-            } else {
-                window.location.href = 'student-dashboard.html';
             }
         });
         
