@@ -5,36 +5,165 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - Python Test Platform</title>
     <link rel="stylesheet" href="css/styles.css">
-</head>
-<body onload="initStudentDashboard()">
-    <div class="container">
-        <header class="dashboard-header">
-            <h1>Student Dashboard</h1>
-            <div class="user-info">
-                <span id="user-name"></span>
-                <button onclick="logout()" class="btn btn-small">Logout</button>
-            </div>
-        </header>
+    <style>
+        body {
+            background: var(--bg-primary);
+        }
         
-        <main>
-            <div class="dashboard-content">
-                <section class="profile-section">
-                    <h2>Your Profile</h2>
-                    <div id="profile-details"></div>
-                </section>
-                
-                <section class="tests-section">
-                    <h2>Available Tests</h2>
-                    <div id="available-tests"></div>
-                </section>
-                
-                <section class="history-section">
-                    <h2>Test History</h2>
-                    <div id="test-history"></div>
-                </section>
+        .dashboard-header {
+            animation: slideDown 0.4s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dashboard-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-8);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-10);
+        }
+        
+        .profile-section,
+        .tests-section,
+        .history-section,
+        .section {
+            width: 100%;
+            animation: fadeIn 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .profile-section { animation-delay: 0.1s; }
+        .tests-section { animation-delay: 0.2s; }
+        .history-section { animation-delay: 0.3s; }
+        
+        .profile-section h2,
+        .tests-section h2,
+        .history-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-6);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .profile-section h2::before {
+            content: '👤';
+            font-size: 1.75rem;
+        }
+        
+        .tests-section h2::before {
+            content: '📝';
+            font-size: 1.75rem;
+        }
+        
+        .history-section h2::before {
+            content: '📊';
+            font-size: 1.75rem;
+        }
+        
+        .section-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .profile-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+        
+        .profile-item {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            transition: all 0.3s;
+        }
+        
+        .profile-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+        
+        .profile-item strong {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-item span {
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+        
+        .tests-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+        
+        @media (max-width: 768px) {
+            .tests-grid {
+                flex-direction: column;
+            }
+            .profile-grid {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>Student Dashboard</h1>
+        <div class="user-info">
+            <span id="user-name" style="font-weight: 500; color: var(--text-secondary);"></span>
+            <button onclick="logout()" class="btn btn-secondary btn-sm">Logout</button>
+        </div>
+    </header>
+    
+    <main class="dashboard-content">
+        <section class="profile-section">
+            <h2>Your Profile</h2>
+            <div id="profile-details" class="profile-grid"></div>
+        </section>
+        
+        <section class="tests-section">
+            <h2>Available Tests</h2>
+            <div id="available-tests" class="tests-grid">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-text">Loading tests...</div>
+                </div>
             </div>
-        </main>
-    </div>
+        </section>
+        
+        <!-- Test History Section -->
+        <section class="history-section">
+            <h2>Test History</h2>
+            <div id="test-history">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <div class="empty-state-text">Loading history...</div>
+                </div>
+            </div>
+        </section>
+    </main>
     
     <!-- Load questions data -->
     <script src="data/questions.js"></script>
@@ -102,15 +231,66 @@
         function displayUserInfo() {
             document.getElementById('user-name').textContent = currentUser.name;
             document.getElementById('profile-details').innerHTML = `
-                <p><strong>Email:</strong> ${currentUser.email}</p>
-                <p><strong>Department:</strong> ${currentUser.department || 'N/A'}</p>
-                <p><strong>WhatsApp:</strong> ${currentUser.whatsapp || 'N/A'}</p>
+                <div class=\"profile-item\">
+                    <strong>Full Name</strong>
+                    <span>${currentUser.name}</span>
+                </div>
+                <div class=\"profile-item\">
+                    <strong>Email Address</strong>
+                    <span>${currentUser.email}</span>
+                </div>
+                <div class=\"profile-item\">
+                    <strong>Department</strong>
+                    <span>${currentUser.department || 'Not Set'}</span>
+                </div>
+                <div class=\"profile-item\">
+                    <strong>WhatsApp</strong>
+                    <span>${currentUser.whatsapp || 'Not Set'}</span>
+                </div>
             `;
         }
         
         async function loadData() {
             await loadAvailableTests();
             await loadTestHistory();
+            updateStatistics();
+        }
+        
+        function updateStatistics() {
+            // Get all test cards
+            const allTests = document.querySelectorAll('.test-card').length;
+            const availableTests = document.querySelectorAll('.test-card:not(.disabled)').length;
+            
+            // Update available tests count
+            document.getElementById('stat-available').textContent = availableTests;
+            
+            // Calculate from test history
+            const historyTable = document.querySelector('.table tbody');
+            if (historyTable) {
+                const rows = historyTable.querySelectorAll('tr');
+                const completedTests = rows.length;
+                let totalScore = 0;
+                let totalMarks = 0;
+                
+                rows.forEach(row => {
+                    const scoreText = row.cells[2]?.textContent || '';
+                    const match = scoreText.match(/(\d+)\/(\d+)/);
+                    if (match) {
+                        totalScore += parseInt(match[1]);
+                        totalMarks += parseInt(match[2]);
+                    }
+                });
+                
+                document.getElementById('stat-completed').textContent = completedTests;
+                document.getElementById('stat-total-marks').textContent = totalScore;
+                
+                const avgPercentage = totalMarks > 0 ? Math.round((totalScore / totalMarks) * 100) : 0;
+                document.getElementById('stat-average').textContent = avgPercentage + '%';
+            } else {
+                document.getElementById('stat-completed').textContent = '0';
+                document.getElementById('stat-total-marks').textContent = '0';
+                document.getElementById('stat-average').textContent = '0%';
+            }
         }
         
         async function loadAvailableTests() {
@@ -118,7 +298,13 @@
             const container = document.getElementById('available-tests');
             
             if (tests.length === 0) {
-                container.innerHTML = '<p class="no-data">No tests available at this time.</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div class="empty-state-text">No tests available</div>
+                        <div class="empty-state-subtext">Check back later for new tests</div>
+                    </div>
+                `;
                 return;
             }
             
@@ -131,19 +317,40 @@
                     Array.from(new Set(window.testMetadata?.topics || ['Python Basics'])) : ['Python Basics'];
                 
                 html.push(`
-                    <div class="test-card">
+                    <div class="test-card ${!canStart || hasAttempted ? 'disabled' : ''}" ${canStart && !hasAttempted ? `onclick="startTest('${test.id}')"` : ''}>
                         <h3>${test.title}</h3>
-                        <p><strong>Duration:</strong> ${test.duration} minutes</p>
-                        <p><strong>Total Marks:</strong> ${test.totalMarks || 'N/A'}</p>
-                        <p><strong>Questions:</strong> ${test.questions ? test.questions.length : 0}</p>
-                        <p><strong>Topics:</strong> ${topics.join(', ')}</p>
-                        <p><strong>Available:</strong> ${test.startDate} to ${test.endDate}</p>
-                        ${hasAttempted ? 
-                            '<p class="status-text" style="color: #ffc107;">Already attempted</p>' :
-                            canStart ? 
-                                `<button onclick="startTest('${test.id}')" class="btn btn-primary">Start Test</button>` :
-                                '<p class="status-text">Test not available</p>'
-                        }
+                        
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin: 1rem 0;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--text-tertiary); font-size: 0.875rem;">⏱️ Duration:</span>
+                                <span style="font-weight: 600;">${test.duration} minutes</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--text-tertiary); font-size: 0.875rem;">📊 Total Marks:</span>
+                                <span style="font-weight: 600;">${test.totalMarks || 'N/A'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--text-tertiary); font-size: 0.875rem;">❓ Questions:</span>
+                                <span style="font-weight: 600;">${test.questions ? test.questions.length : 0}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--text-tertiary); font-size: 0.875rem;">📅 Available:</span>
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">${test.startDate} to ${test.endDate}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="test-topics">
+                            ${topics.map(topic => `<span class="topic-tag">${topic}</span>`).join('')}
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-secondary); display: flex; align-items: center; justify-content: space-between;">
+                            ${hasAttempted ? 
+                                '<span class="badge badge-warning">Completed</span>' :
+                                canStart ? 
+                                    '<button class="btn btn-primary" onclick="event.stopPropagation(); startTest(\'' + test.id + '\')">Start Test</button>' :
+                                    '<span class="badge badge-neutral">Not Available</span>'
+                            }
+                        </div>
                     </div>
                 `);
             }
@@ -163,7 +370,13 @@
             const container = document.getElementById('test-history');
             
             if (attempts.length === 0) {
-                container.innerHTML = '<p class="no-data">No test attempts yet.</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <div class="empty-state-text">No test attempts yet</div>
+                        <div class="empty-state-subtext">Your completed tests will appear here</div>
+                    </div>
+                `;
                 return;
             }
             
@@ -175,28 +388,41 @@
             }));
             
             container.innerHTML = `
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>Test</th>
-                            <th>Start Time</th>
-                            <th>Submit Time</th>
-                            <th>Score</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${formattedAttempts.map(attempt => `
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>${attempt.testTitle}</td>
-                                <td>${new Date(attempt.startTime).toLocaleString()}</td>
-                                <td>${new Date(attempt.submitTime).toLocaleString()}</td>
-                                <td>${attempt.totalScore}/${attempt.maxScore}</td>
-                                <td>${attempt.autoSubmitted ? 'Auto-Submitted' : 'Submitted'}</td>
+                                <th>Test</th>
+                                <th>Start Time</th>
+                                <th>Submit Time</th>
+                                <th>Score</th>
+                                <th>Status</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${formattedAttempts.map(attempt => {
+                                const percentage = ((attempt.totalScore / attempt.maxScore) * 100).toFixed(1);
+                                const statusClass = percentage >= 70 ? 'badge-success' : percentage >= 50 ? 'badge-warning' : 'badge-error';
+                                return `
+                                    <tr>
+                                        <td style="font-weight: 600;">${attempt.testTitle}</td>
+                                        <td>${new Date(attempt.startTime).toLocaleString()}</td>
+                                        <td>${new Date(attempt.submitTime).toLocaleString()}</td>
+                                        <td>
+                                            <strong>${attempt.totalScore}/${attempt.maxScore}</strong>
+                                            <span style="color: var(--text-tertiary); margin-left: 0.5rem;">(${percentage}%)</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge ${statusClass}">
+                                                ${attempt.autoSubmitted ? 'Auto-Submitted' : 'Submitted'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
             `;
         }
         
@@ -222,7 +448,7 @@
         };
         
         // Initialize on load
-        initStudentDashboard();
+        window.addEventListener('DOMContentLoaded', initStudentDashboard);
     </script>
 </body>
 </html>

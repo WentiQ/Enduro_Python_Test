@@ -3,35 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Python Test Platform</title>
+    <title>Sign In - Python Test Platform</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 480px;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .login-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-2xl);
+            padding: 3rem;
+            box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.15);
+            border: 1px solid var(--border-primary);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .login-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .google-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .google-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .google-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-primary);
+        }
+        
+        .auth-divider span {
+            padding: 0 1rem;
+        }
+        
+        .demo-btn {
+            width: 100%;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+        }
+        
+        .demo-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent);
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .back-link a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        
+        .back-link a:hover {
+            color: var(--accent);
+        }
+        
+        .form-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-primary);
+        }
+        
+        .form-section h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: var(--bg-secondary);
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="login-box">
-            <h1>Sign In</h1>
-            <p id="login-message">Please sign in to continue</p>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="login-title">Welcome Back</h1>
+                <p class="login-subtitle" id="login-message">Sign in to continue to your dashboard</p>
+            </div>
             
-            <button id="google-signin-btn" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <button id="google-signin-btn" class="btn btn-primary google-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24">
                     <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                     <path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
-                Sign in with Google
+                <span>Sign in with Google</span>
             </button>
             
             <div class="auth-divider">
                 <span>OR</span>
             </div>
             
-            <button id="demo-login-btn" class="btn btn-secondary" style="width: 100%;">
-                Demo Login (Testing Only)
+            <button id="demo-login-btn" class="btn demo-btn">
+                <span>👤 Continue with Demo Account</span>
             </button>
             
-            <div id="additional-info" style="display:none;">
-                <h3>Additional Information Required</h3>
+            <div id="additional-info" class="form-section" style="display:none;">
+                <h3>Complete Your Profile</h3>
                 <form id="user-info-form">
                     <div class="form-group">
                         <label for="name">Full Name:</label>
@@ -63,61 +235,31 @@
         </div>
     </div>
     
-    <!-- Non-module script for local testing -->
-    <script>
-        console.log('Script loaded');
+    <script type="module">
+        import { signInWithGoogle, createUser, demoLogin } from './js/firebase-auth.js';
         
         // Check if this is admin login
         const urlParams = new URLSearchParams(window.location.search);
         const isAdminLogin = urlParams.get('admin') === 'true';
         
         if (isAdminLogin) {
-            document.getElementById('login-message').textContent = 'Admin Login - Please sign in';
+            document.querySelector('.login-subtitle').textContent = 'Administrator Access Portal';
         }
         
-        // Demo Login button (works without Firebase)
-        document.getElementById('demo-login-btn').addEventListener('click', () => {
-            console.log('Demo login clicked');
-            const demoUser = {
-                uid: 'demo_' + Date.now(),
-                email: isAdminLogin ? 'admin@demo.com' : 'student@demo.com',
-                name: isAdminLogin ? 'Demo Admin' : 'Demo Student',
-                role: isAdminLogin ? 'admin' : 'student',
-                department: 'Demo Department',
-                whatsapp: '+1234567890',
-                picture: 'https://via.placeholder.com/150'
-            };
-            
-            // Store in sessionStorage
-            sessionStorage.setItem('currentUser', JSON.stringify(demoUser));
-            sessionStorage.setItem('demoMode', 'true');
-            
-            // Redirect
-            if (isAdminLogin) {
-                window.location.href = 'admin-dashboard.html';
-            } else {
-                window.location.href = 'student-dashboard.html';
+        // Demo Login button
+        document.getElementById('demo-login-btn').addEventListener('click', async () => {
+            try {
+                const result = await demoLogin(isAdminLogin);
+                sessionStorage.setItem('currentUser', JSON.stringify(result));
+                window.location.href = result.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
+            } catch (error) {
+                console.error('Demo login error:', error);
+                alert('Demo login failed: ' + error.message);
             }
         });
-    </script>
-    
-    <script type="module">
-        import { signInWithGoogle, createUser, demoLogin } from './js/firebase-auth.js';
-        
-        console.log('Firebase module loaded');
-        
-        // Check if this is admin login
-        const urlParams = new URLSearchParams(window.location.search);
-        const isAdminLogin = urlParams.get('admin') === 'true';
         
         // Google Sign-In button
         document.getElementById('google-signin-btn').addEventListener('click', async () => {
-            console.log('Google sign-in clicked');
-            const btn = document.getElementById('google-signin-btn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = 'Signing in...';
-            
             try {
                 const result = await signInWithGoogle();
                 console.log('Login result:', result); // Debug log
@@ -126,8 +268,6 @@
                     // New user - only allow student registration
                     if (isAdminLogin) {
                         alert('Admin account not found. New users can only register as students. Please contact the administrator to get admin access.');
-                        btn.disabled = false;
-                        btn.innerHTML = originalText;
                         return;
                     }
                     
@@ -141,23 +281,17 @@
                     
                     document.getElementById('additional-info').style.display = 'block';
                     document.getElementById('login-message').textContent = 'Please provide additional information';
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
                 } else {
                     // Existing user - check role
                     console.log('User role:', result.role, 'Admin login?', isAdminLogin);
                     
                     if (isAdminLogin && result.role !== 'admin') {
                         alert('Access denied. This account is not registered as an administrator. Please use student login or contact the administrator.');
-                        btn.disabled = false;
-                        btn.innerHTML = originalText;
                         return;
                     }
                     
                     if (!isAdminLogin && result.role === 'admin') {
                         alert('This is an administrator account. Please use "Admin Login" button from the homepage.');
-                        btn.disabled = false;
-                        btn.innerHTML = originalText;
                         return;
                     }
                     
@@ -175,16 +309,7 @@
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-                
-                if (error.code === 'auth/unauthorized-domain') {
-                    alert('Firebase Error: This domain is not authorized. Please add it to Firebase Console > Authentication > Settings > Authorized domains. For now, use Demo Login to test the application.');
-                } else if (error.code === 'auth/popup-closed-by-user') {
-                    // User closed the popup, no need to show error
-                } else {
-                    alert('Login failed: ' + error.message + '\n\nYou can use Demo Login for testing.');
-                }
+                alert('Login failed. Please try again. Error: ' + error.message);
             }
         });
         

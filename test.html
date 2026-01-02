@@ -6,10 +6,21 @@
     <title>Test - Python Test Platform</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/test.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
 </head>
 <body onload="initTest()" onbeforeunload="confirmLeave()">
     <!-- Hamburger Menu Button -->
-    <button class="hamburger-btn" onclick="toggleSidebar()" title="Question Palette">
+    <button class="hamburger-btn" onclick="toggleSidebar()" title="Question Palette" aria-label="Toggle Question Palette">
         <span></span>
         <span></span>
         <span></span>
@@ -18,8 +29,8 @@
     <!-- Sidebar Navigation (JEE Style) -->
     <div class="sidebar" id="question-sidebar">
         <div class="sidebar-header">
-            <h3>Question Palette</h3>
-            <button class="close-sidebar" onclick="toggleSidebar()">✕</button>
+            <h3>📋 Question Palette</h3>
+            <button class="close-sidebar" onclick="toggleSidebar()" aria-label="Close sidebar">✕</button>
         </div>
         
         <div class="legend">
@@ -50,14 +61,14 @@
     <div class="test-container">
         <div class="test-header">
             <div class="header-left">
-                <h1 id="test-title"></h1>
+                <h1 id="test-title" style="font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem;"><span>🎯</span><span></span></h1>
             </div>
             <div class="header-right">
                 <div class="timer-container">
-                    <span class="timer-label">Time Remaining:</span>
+                    <span class="timer-label">⏱️ Time:</span>
                     <span id="timer" class="timer">60:00</span>
                 </div>
-                <button onclick="confirmSubmit()" class="btn btn-submit">Submit Test</button>
+                <button onclick="confirmSubmit()" class="btn btn-submit">✓ Submit Test</button>
             </div>
         </div>
         
