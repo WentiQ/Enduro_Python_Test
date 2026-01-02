@@ -34,6 +34,25 @@ function initTest() {
         return;
     }
     
+    // Check if test is available (within time range)
+    const now = new Date();
+    const startDateTime = currentTest.startDateTime || (currentTest.startDate + 'T00:00');
+    const endDateTime = currentTest.endDateTime || (currentTest.endDate + 'T23:59');
+    const start = new Date(startDateTime);
+    const end = new Date(endDateTime);
+    
+    if (now < start) {
+        alert('This test is not yet available. It will start on ' + start.toLocaleString());
+        window.location.href = 'student-dashboard.html';
+        return;
+    }
+    
+    if (now > end) {
+        alert('This test has ended. It was available until ' + end.toLocaleString());
+        window.location.href = 'student-dashboard.html';
+        return;
+    }
+    
     // Check if already attempted
     const attempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
     const alreadyAttempted = attempts.some(a => a.userEmail === user.email && a.testId === testId);

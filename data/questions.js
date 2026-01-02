@@ -517,6 +517,9 @@ function initializeTestQuestions() {
     
     if (!enduroTestExists) {
         // Create Enduro Python Test with all questions
+        const now = new Date();
+        const endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+        
         const enduroTest = {
             id: 'test_enduro_' + Date.now(),
             title: 'Enduro Python Test',
@@ -524,8 +527,10 @@ function initializeTestQuestions() {
             duration: window.testMetadata.duration,
             totalMarks: window.testMetadata.totalMarks,
             questions: window.defaultQuestions,
-            startDate: new Date().toISOString().split('T')[0],
-            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+            startDate: now.toISOString().split('T')[0],
+            endDate: endDate.toISOString().split('T')[0],
+            startDateTime: now.toISOString().slice(0, 16), // YYYY-MM-DDTHH:MM
+            endDateTime: endDate.toISOString().slice(0, 16), // YYYY-MM-DDTHH:MM
             isActive: true,
             createdAt: new Date().toISOString()
         };

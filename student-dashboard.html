@@ -333,9 +333,15 @@
                                 <span style="color: var(--text-tertiary); font-size: 0.875rem;">❓ Questions:</span>
                                 <span style="font-weight: 600;">${test.questions ? test.questions.length : 0}</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="color: var(--text-tertiary); font-size: 0.875rem;">📅 Available:</span>
-                                <span style="font-size: 0.875rem; color: var(--text-secondary);">${test.startDate} to ${test.endDate}</span>
+                            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="color: var(--text-tertiary); font-size: 0.875rem;">🕐 Start:</span>
+                                    <span style="font-size: 0.875rem; color: var(--text-secondary);">${test.startDateTime ? new Date(test.startDateTime).toLocaleString() : test.startDate}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="color: var(--text-tertiary); font-size: 0.875rem;">🕐 End:</span>
+                                    <span style="font-size: 0.875rem; color: var(--text-secondary);">${test.endDateTime ? new Date(test.endDateTime).toLocaleString() : test.endDate}</span>
+                                </div>
                             </div>
                         </div>
                         
@@ -360,8 +366,14 @@
         
         async function canStartTest(test) {
             const now = new Date();
-            const start = new Date(test.startDate);
-            const end = new Date(test.endDate);
+            
+            // Use datetime if available, otherwise fall back to date
+            const startDateTime = test.startDateTime || (test.startDate + 'T00:00');
+            const endDateTime = test.endDateTime || (test.endDate + 'T23:59');
+            
+            const start = new Date(startDateTime);
+            const end = new Date(endDateTime);
+            
             return now >= start && now <= end;
         }
         

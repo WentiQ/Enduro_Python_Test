@@ -106,18 +106,6 @@
             padding: 0 1rem;
         }
         
-        .demo-btn {
-            width: 100%;
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-primary);
-        }
-        
-        .demo-btn:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent);
-        }
-        
         .back-link {
             text-align: center;
             margin-top: 2rem;
@@ -194,14 +182,6 @@
                 <span>Sign in with Google</span>
             </button>
             
-            <div class="auth-divider">
-                <span>OR</span>
-            </div>
-            
-            <button id="demo-login-btn" class="btn demo-btn">
-                <span>👤 Continue with Demo Account</span>
-            </button>
-            
             <div id="additional-info" class="form-section" style="display:none;">
                 <h3>Complete Your Profile</h3>
                 <form id="user-info-form">
@@ -236,7 +216,7 @@
     </div>
     
     <script type="module">
-        import { signInWithGoogle, createUser, demoLogin } from './js/firebase-auth.js';
+        import { signInWithGoogle, createUser } from './js/firebase-auth.js';
         
         // Check if this is admin login
         const urlParams = new URLSearchParams(window.location.search);
@@ -245,18 +225,6 @@
         if (isAdminLogin) {
             document.querySelector('.login-subtitle').textContent = 'Administrator Access Portal';
         }
-        
-        // Demo Login button
-        document.getElementById('demo-login-btn').addEventListener('click', async () => {
-            try {
-                const result = await demoLogin(isAdminLogin);
-                sessionStorage.setItem('currentUser', JSON.stringify(result));
-                window.location.href = result.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
-            } catch (error) {
-                console.error('Demo login error:', error);
-                alert('Demo login failed: ' + error.message);
-            }
-        });
         
         // Google Sign-In button
         document.getElementById('google-signin-btn').addEventListener('click', async () => {

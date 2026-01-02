@@ -7,11 +7,130 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/admin.css">
     <style>
-        body {
-            background: var(--bg-primary);
+        :root {
+            --admin-sidebar-width: 280px;
+            --admin-header-height: 70px;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.15);
         }
         
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
+            overflow-x: hidden;
+        }
+        
+        /* Modern Sidebar */
+        .admin-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--admin-sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+            padding: 2rem 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-xl);
+            animation: slideInLeft 0.4s ease-out;
+        }
+        
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        
+        .sidebar-logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-logo h2 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sidebar-logo h2::before {
+            content: '⚡';
+            font-size: 2rem;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+            padding: 0 1rem;
+        }
+        
+        .sidebar-nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .sidebar-nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .sidebar-nav-link .icon {
+            font-size: 1.5rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content Area */
+        .admin-main {
+            margin-left: var(--admin-sidebar-width);
+            min-height: 100vh;
+            background: #f8f9fc;
+        }
+        
+        /* Modern Header */
         .dashboard-header {
+            background: white;
+            height: var(--admin-header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 3rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
             animation: slideDown 0.4s ease-out;
         }
         
@@ -20,44 +139,154 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: var(--space-8);
+        .dashboard-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
-        .admin-tabs {
+        .user-info {
             display: flex;
-            gap: var(--space-4);
-            margin-bottom: var(--space-8);
-            border-bottom: 2px solid var(--border-primary);
-            padding-bottom: 0;
-            animation: fadeIn 0.5s ease-out 0.1s both;
+            align-items: center;
+            gap: 1.5rem;
         }
         
-        .tab-btn {
-            padding: var(--space-4) var(--space-6);
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: var(--text-secondary);
+        .user-info #admin-name {
             font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .user-info #admin-name::before {
+            content: '👤';
+            font-size: 1.25rem;
+        }
+        
+        .user-info .btn {
+            padding: 0.65rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
             transition: all 0.3s;
+        }
+        
+        .user-info .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
             position: relative;
-            margin-bottom: -2px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .tab-btn:hover {
-            color: var(--accent);
-            background: var(--bg-hover);
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
         }
         
-        .tab-btn.active {
-            color: var(--accent);
-            border-bottom-color: var(--accent);
-            background: linear-gradient(180deg, transparent 0%, var(--accent-light) 100%);
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card.success::before {
+            background: var(--gradient-success);
+        }
+        
+        .stat-card.warning::before {
+            background: var(--gradient-warning);
+        }
+        
+        .stat-card.info::before {
+            background: var(--gradient-info);
+        }
+        
+        .stat-card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .stat-card-info h3 {
+            color: #718096;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .stat-card-info .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            line-height: 1;
+        }
+        
+        .stat-card-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: var(--gradient-primary);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-card.success .stat-card-icon {
+            background: var(--gradient-success);
+            box-shadow: 0 8px 16px rgba(17, 153, 142, 0.3);
+        }
+        
+        .stat-card.warning .stat-card-icon {
+            background: var(--gradient-warning);
+            box-shadow: 0 8px 16px rgba(240, 147, 251, 0.3);
+        }
+        
+        .stat-card.info .stat-card-icon {
+            background: var(--gradient-info);
+            box-shadow: 0 8px 16px rgba(79, 172, 254, 0.3);
+        }
+        
+        .container {
+            padding: 3rem;
+            animation: fadeIn 0.6s ease-out 0.2s both;
+        }
+        
+        /* Modern Tabs */
+        .admin-tabs {
+            display: none; /* Hidden since we're using sidebar navigation */
         }
         
         .tab-content {
@@ -69,39 +298,287 @@
             display: block;
         }
         
-        .tab-content h2 {
-            font-size: 1.75rem;
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header h2 {
+            font-size: 1.875rem;
             font-weight: 700;
-            margin-bottom: var(--space-6);
-            color: var(--text-primary);
+            color: #2d3748;
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
         
+        /* Modern Filters */
         .filters {
-            display: flex;
-            gap: var(--space-4);
-            margin-bottom: var(--space-6);
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
         }
         
         .filters input,
         .filters select {
-            flex: 1;
-            min-width: 200px;
-            padding: var(--space-3) var(--space-4);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--radius-md);
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
             font-size: 0.95rem;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            background: white;
+            font-family: inherit;
         }
         
         .filters input:focus,
         .filters select:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .filters input::placeholder {
+            color: #a0aec0;
+        }
+        
+        /* Content Card */
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .content-card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid #f7fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .content-card-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .content-card-body {
+            padding: 2rem;
+        }
+        
+        /* Modern Buttons */
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--gradient-success);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        /* Improved Tables */
+        .table-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 600px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+        
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+        
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 800px;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        thead th {
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            white-space: nowrap;
+        }
+        
+        tbody tr {
+            transition: all 0.2s;
+            border-bottom: 1px solid #f7fafc;
+        }
+        
+        tbody tr:hover {
+            background: #f7fafc;
+            transform: scale(1.01);
+        }
+        
+        tbody td {
+            padding: 1.25rem 1.5rem;
+            color: #4a5568;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        
+        /* Form Improvements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        #add-test-form {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            margin-top: 2rem;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        #add-test-form h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f7fafc;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .admin-main {
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .dashboard-header {
+                padding: 0 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                grid-template-columns: 1fr;
+            }
         }
         
         @keyframes fadeIn {
@@ -111,20 +588,118 @@
     </style>
 </head>
 <body onload="initAdminDashboard()">
-    <header class="dashboard-header">
-        <h1>⚙️ Admin Dashboard</h1>
-        <div class="user-info">
-            <span id="admin-name" style="font-weight: 500;"></span>
-            <button onclick="logout()" class="btn btn-secondary btn-sm">Logout</button>
+    <!-- Modern Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <h2>Admin Panel</h2>
         </div>
-    </header>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="#" class="sidebar-nav-link active" onclick="showTab('overview'); return false;">
+                        <span class="icon">📊</span>
+                        <span>Overview</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#" class="sidebar-nav-link" onclick="showTab('students'); return false;">
+                        <span class="icon">👥</span>
+                        <span>Students</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#" class="sidebar-nav-link" onclick="showTab('attempts'); return false;">
+                        <span class="icon">📈</span>
+                        <span>Test Attempts</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="#" class="sidebar-nav-link" onclick="showTab('tests'); return false;">
+                        <span class="icon">📝</span>
+                        <span>Manage Tests</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
     
-    <div class=\"container\">\n        <main>\n            <div class=\"admin-tabs\">\n                <button class=\"tab-btn active\" onclick=\"showTab('students')\">👥 Students</button>\n                <button class=\"tab-btn\" onclick=\"showTab('attempts')\">📊 Test Attempts</button>\n                <button class=\"tab-btn\" onclick=\"showTab('tests')\">📝 Manage Tests</button>\n            </div>
+    <!-- Main Content Area -->
+    <div class="admin-main">
+        <header class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <div class="user-info">
+                <span id="admin-name"></span>
+                <button onclick="logout()" class="btn btn-secondary">Logout</button>
+            </div>
+        </header>
+        
+        <div class="container">
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content active">
+                <div class="section-header">
+                    <h2>📊 Dashboard Overview</h2>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-content">
+                            <div class="stat-card-info">
+                                <h3>Total Students</h3>
+                                <div class="stat-value" id="total-students">0</div>
+                            </div>
+                            <div class="stat-card-icon">👥</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card success">
+                        <div class="stat-card-content">
+                            <div class="stat-card-info">
+                                <h3>Test Attempts</h3>
+                                <div class="stat-value" id="total-attempts">0</div>
+                            </div>
+                            <div class="stat-card-icon">📈</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card warning">
+                        <div class="stat-card-content">
+                            <div class="stat-card-info">
+                                <h3>Active Tests</h3>
+                                <div class="stat-value" id="total-tests">0</div>
+                            </div>
+                            <div class="stat-card-icon">📝</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card info">
+                        <div class="stat-card-content">
+                            <div class="stat-card-info">
+                                <h3>Avg Score</h3>
+                                <div class="stat-value" id="avg-score">0%</div>
+                            </div>
+                            <div class="stat-card-icon">🎯</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h3>Recent Activity</h3>
+                    </div>
+                    <div class="content-card-body">
+                        <p style="color: #718096; text-align: center; padding: 2rem;">Select a section from the sidebar to view detailed information.</p>
+                    </div>
+                </div>
+            </div>
             
-            <div id="students-tab" class="tab-content active">
-                <h2>Registered Students</h2>
+            <!-- Students Tab -->
+            <div id="students-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>👥 Registered Students</h2>
+                </div>
+                
                 <div class="filters">
-                    <input type="text" id="student-search" placeholder="Search by name or email..." onkeyup="filterStudents()">
+                    <input type="text" id="student-search" placeholder="🔍 Search by name or email..." onkeyup="filterStudents()">
                     <select id="dept-filter" onchange="filterStudents()">
                         <option value="">All Departments</option>
                         <option value="Computer Science">Computer Science</option>
@@ -135,54 +710,83 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                <div id="students-list"></div>
+                
+                <div class="content-card">
+                    <div class="content-card-body">
+                        <div id="students-list"></div>
+                    </div>
+                </div>
             </div>
             
+            <!-- Attempts Tab -->
             <div id="attempts-tab" class="tab-content">
-                <h2>Test Attempts</h2>
+                <div class="section-header">
+                    <h2>📈 Test Attempts</h2>
+                </div>
+                
                 <div class="filters">
-                    <input type="text" id="attempt-search" placeholder="Search by student email..." onkeyup="filterAttempts()">
+                    <input type="text" id="attempt-search" placeholder="🔍 Search by student email..." onkeyup="filterAttempts()">
                     <select id="test-filter" onchange="filterAttempts()">
                         <option value="">All Tests</option>
                     </select>
                 </div>
-                <div id="attempts-list"></div>
+                
+                <div class="content-card">
+                    <div class="content-card-body">
+                        <div id="attempts-list"></div>
+                    </div>
+                </div>
             </div>
             
+            <!-- Tests Tab -->
             <div id="tests-tab" class="tab-content">
-                <h2>Manage Tests</h2>
-                <button onclick="showAddTestForm()" class="btn btn-primary">Add New Test</button>
-                <button onclick="reinitializeTests()" class="btn btn-secondary" style="margin-left: 10px;">Reinitialize Enduro Test</button>
-                <div id="tests-list"></div>
+                <div class="section-header">
+                    <h2>📝 Manage Tests</h2>
+                    <div>
+                        <button onclick="showAddTestForm()" class="btn btn-primary">➕ Add New Test</button>
+                        <button onclick="reinitializeTests()" class="btn btn-secondary" style="margin-left: 10px;">🔄 Reinitialize Enduro Test</button>
+                    </div>
+                </div>
+                
+                <div class="content-card">
+                    <div class="content-card-body">
+                        <div id="tests-list"></div>
+                    </div>
+                </div>
+                
                 <div id="add-test-form" style="display:none;">
-                    <h3>Add New Test</h3>
+                    <h3>➕ Add New Test</h3>
                     <form onsubmit="saveTest(event)">
                         <div class="form-group">
                             <label>Test Title:</label>
-                            <input type="text" id="test-title" required>
+                            <input type="text" id="test-title" placeholder="Enter test title..." required>
                         </div>
                         <div class="form-group">
                             <label>Description:</label>
-                            <textarea id="test-desc" required></textarea>
+                            <textarea id="test-desc" placeholder="Enter test description..." required></textarea>
                         </div>
                         <div class="form-group">
                             <label>Duration (minutes):</label>
-                            <input type="number" id="test-duration" min="1" value="60" required>
+                            <input type="number" id="test-duration" min="1" value="60" placeholder="60" required>
                         </div>
                         <div class="form-group">
-                            <label>Start Date:</label>
-                            <input type="date" id="test-start" required>
+                            <label>Start Date & Time:</label>
+                            <input type="datetime-local" id="test-start" required>
+                            <small style="color: #718096; display: block; margin-top: 0.25rem;">Students can start the test from this date and time</small>
                         </div>
                         <div class="form-group">
-                            <label>End Date:</label>
-                            <input type="date" id="test-end" required>
+                            <label>End Date & Time:</label>
+                            <input type="datetime-local" id="test-end" required>
+                            <small style="color: #718096; display: block; margin-top: 0.25rem;">Students cannot start the test after this date and time</small>
                         </div>
-                        <button type="submit" class="btn btn-success">Save Test</button>
-                        <button type="button" onclick="hideAddTestForm()" class="btn btn-secondary">Cancel</button>
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-success">✓ Save Test</button>
+                            <button type="button" onclick="hideAddTestForm()" class="btn btn-secondary">✗ Cancel</button>
+                        </div>
                     </form>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
     
     <!-- Load questions data -->
@@ -207,7 +811,8 @@
                 }
                 
                 document.getElementById('admin-name').textContent = currentUser.name;
-                showTab('students');
+                showTab('overview');
+                loadDashboardStats();
                 return;
             }
             
@@ -239,8 +844,75 @@
                 }
                 
                 document.getElementById('admin-name').textContent = currentUser.name;
-                showTab('students');
+                showTab('overview');
+                loadDashboardStats();
             });
+        }
+        
+        window.showTab = function(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav links
+            document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(tabName + '-tab');
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+            
+            // Add active class to clicked nav link
+            event.target.closest('.sidebar-nav-link')?.classList.add('active');
+            
+            // Load data for the tab
+            if (tabName === 'overview') {
+                loadDashboardStats();
+            } else if (tabName === 'students') {
+                if (typeof window.loadStudents === 'function') {
+                    window.loadStudents();
+                }
+            } else if (tabName === 'attempts') {
+                if (typeof window.loadAttempts === 'function') {
+                    window.loadAttempts();
+                }
+            } else if (tabName === 'tests') {
+                if (typeof window.loadTests === 'function') {
+                    window.loadTests();
+                }
+            }
+        };
+        
+        async function loadDashboardStats() {
+            try {
+                // Load students
+                const students = await getAllUsers();
+                const studentUsers = students.filter(u => u.role === 'student');
+                document.getElementById('total-students').textContent = studentUsers.length;
+                
+                // Load attempts
+                const attempts = await getAllTestAttempts();
+                document.getElementById('total-attempts').textContent = attempts.length;
+                
+                // Calculate average score
+                if (attempts.length > 0) {
+                    const totalScore = attempts.reduce((sum, attempt) => sum + (attempt.score || 0), 0);
+                    const avgScore = Math.round(totalScore / attempts.length);
+                    document.getElementById('avg-score').textContent = avgScore + '%';
+                } else {
+                    document.getElementById('avg-score').textContent = '0%';
+                }
+                
+                // Load tests
+                const tests = await getAllTests();
+                document.getElementById('total-tests').textContent = tests.length;
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
         }
         
         window.logout = async function() {

@@ -68,33 +68,35 @@ function loadStudents() {
     }
     
     container.innerHTML = `
-        <table class="students-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Department</th>
-                    <th>WhatsApp</th>
-                    <th>Registered Date</th>
-                    <th>Tests Taken</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${students.map(student => {
-                    const attempts = getStudentAttempts(student.email);
-                    return `
-                        <tr>
-                            <td>${student.name}</td>
-                            <td>${student.email}</td>
-                            <td>${student.department || 'N/A'}</td>
-                            <td>${student.whatsapp || 'N/A'}</td>
-                            <td>${new Date(student.createdAt).toLocaleDateString()}</td>
-                            <td>${attempts.length}</td>
-                        </tr>
-                    `;
-                }).join('')}
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>WhatsApp</th>
+                        <th>Registered Date</th>
+                        <th>Tests Taken</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${students.map(student => {
+                        const attempts = getStudentAttempts(student.email);
+                        return `
+                            <tr>
+                                <td>${student.name}</td>
+                                <td>${student.email}</td>
+                                <td>${student.department || 'N/A'}</td>
+                                <td>${student.whatsapp || 'N/A'}</td>
+                                <td>${new Date(student.createdAt).toLocaleDateString()}</td>
+                                <td>${attempts.length}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
     `;
 }
 
@@ -127,33 +129,35 @@ function filterStudents() {
     }
     
     container.innerHTML = `
-        <table class="students-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Department</th>
-                    <th>WhatsApp</th>
-                    <th>Registered Date</th>
-                    <th>Tests Taken</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${students.map(student => {
-                    const attempts = getStudentAttempts(student.email);
-                    return `
-                        <tr>
-                            <td>${student.name}</td>
-                            <td>${student.email}</td>
-                            <td>${student.department || 'N/A'}</td>
-                            <td>${student.whatsapp || 'N/A'}</td>
-                            <td>${new Date(student.createdAt).toLocaleDateString()}</td>
-                            <td>${attempts.length}</td>
-                        </tr>
-                    `;
-                }).join('')}
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>WhatsApp</th>
+                        <th>Registered Date</th>
+                        <th>Tests Taken</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${students.map(student => {
+                        const attempts = getStudentAttempts(student.email);
+                        return `
+                            <tr>
+                                <td>${student.name}</td>
+                                <td>${student.email}</td>
+                                <td>${student.department || 'N/A'}</td>
+                                <td>${student.whatsapp || 'N/A'}</td>
+                                <td>${new Date(student.createdAt).toLocaleDateString()}</td>
+                                <td>${attempts.length}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
     `;
 }
 
@@ -204,7 +208,8 @@ function displayAttempts(attempts) {
     
     container.innerHTML = `
         <button class="export-btn" onclick="exportAttempts()">📥 Export to CSV</button>
-        <table class="attempts-table">
+        <div class="table-container">
+            <table class="attempts-table">
             <thead>
                 <tr>
                     <th>Student Name</th>
@@ -268,6 +273,7 @@ function displayAttempts(attempts) {
                 }).join('')}
             </tbody>
         </table>
+        </div>
     `;
 }
 
@@ -428,14 +434,15 @@ function loadTests() {
                     <p><strong>Duration:</strong> ${test.duration} minutes</p>
                     <p><strong>Total Marks:</strong> ${test.totalMarks || 'N/A'}</p>
                     <p><strong>Topics:</strong> ${topics.join(', ')}</p>
-                    <p><strong>Available:</strong> ${test.startDate} to ${test.endDate}</p>
+                    <p><strong>Start:</strong> ${test.startDateTime ? new Date(test.startDateTime).toLocaleString() : test.startDate}</p>
+                    <p><strong>End:</strong> ${test.endDateTime ? new Date(test.endDateTime).toLocaleString() : test.endDate}</p>
                     <div class="test-meta">
                         <span>${test.questions ? test.questions.length : 0} questions</span>
                         <span>Created: ${new Date(test.createdAt).toLocaleDateString()}</span>
                     </div>
                     <div class="test-actions">
-                        <button class="btn-edit" onclick="editTest('${test.id}')">Edit</button>
-                        <button class="btn-delete" onclick="deleteTest('${test.id}')">Delete</button>
+                        <button class="btn-edit" onclick="editTest('${test.id}')">✏️ Edit</button>
+                        <button class="btn-delete" onclick="deleteTest('${test.id}')">🗑️ Delete</button>
                     </div>
                 </div>
             `}).join('')}
@@ -468,6 +475,16 @@ function saveTest(event) {
     const startDate = document.getElementById('test-start').value;
     const endDate = document.getElementById('test-end').value;
     
+    // Convert dates to datetime for proper comparison
+    const startDateTime = startDate + 'T00:00';
+    const endDateTime = endDate + 'T23:59';
+    
+    // Validate dates
+    if (new Date(endDateTime) <= new Date(startDateTime)) {
+        alert('End date must be after start date');
+        return;
+    }
+    
     const newTest = {
         id: 'test' + Date.now(),
         title: title,
@@ -475,6 +492,8 @@ function saveTest(event) {
         duration: duration,
         startDate: startDate,
         endDate: endDate,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
         questions: [],
         createdAt: new Date().toISOString()
     };
@@ -491,7 +510,101 @@ function saveTest(event) {
 
 // Edit test
 function editTest(testId) {
-    alert('Test editing feature: In a full implementation, this would open a form to edit test details and manage questions.');
+    const tests = JSON.parse(localStorage.getItem('tests') || '[]');
+    const test = tests.find(t => t.id === testId);
+    
+    if (!test) {
+        alert('Test not found');
+        return;
+    }
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'modal show';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <h2>Edit Test</h2>
+            
+            <form id="edit-test-form" style="margin-top: 2rem;">
+                <div class="form-group">
+                    <label>Test Title:</label>
+                    <input type="text" id="edit-title" value="${test.title}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="edit-desc" required>${test.description || ''}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Duration (minutes):</label>
+                    <input type="number" id="edit-duration" value="${test.duration}" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Start Date & Time:</label>
+                    <input type="datetime-local" id="edit-start" value="${test.startDateTime || test.startDate + 'T00:00'}" required>
+                    <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">Students can start the test from this date and time</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>End Date & Time:</label>
+                    <input type="datetime-local" id="edit-end" value="${test.endDateTime || test.endDate + 'T23:59'}" required>
+                    <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">Students cannot start the test after this date and time</small>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Handle form submission
+    document.getElementById('edit-test-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const updatedTest = {
+            ...test,
+            title: document.getElementById('edit-title').value,
+            description: document.getElementById('edit-desc').value,
+            duration: parseInt(document.getElementById('edit-duration').value),
+            startDateTime: document.getElementById('edit-start').value,
+            endDateTime: document.getElementById('edit-end').value,
+            startDate: document.getElementById('edit-start').value.split('T')[0],
+            endDate: document.getElementById('edit-end').value.split('T')[0],
+            updatedAt: new Date().toISOString()
+        };
+        
+        // Validate dates
+        const start = new Date(updatedTest.startDateTime);
+        const end = new Date(updatedTest.endDateTime);
+        
+        if (end <= start) {
+            alert('End date must be after start date');
+            return;
+        }
+        
+        // Update test in storage
+        const allTests = JSON.parse(localStorage.getItem('tests') || '[]');
+        const index = allTests.findIndex(t => t.id === testId);
+        if (index !== -1) {
+            allTests[index] = updatedTest;
+            localStorage.setItem('tests', JSON.stringify(allTests));
+            
+            modal.remove();
+            loadTests();
+            alert('Test updated successfully!');
+        }
+    });
+    
+    // Close modal on backdrop click
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
 }
 
 // Delete test
