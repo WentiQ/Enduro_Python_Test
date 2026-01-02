@@ -261,35 +261,22 @@
             const allTests = document.querySelectorAll('.test-card').length;
             const availableTests = document.querySelectorAll('.test-card:not(.disabled)').length;
             
-            // Update available tests count
-            document.getElementById('stat-available').textContent = availableTests;
+            // Update available tests count if element exists
+            const availableElement = document.getElementById('stat-available');
+            if (availableElement) {
+                availableElement.textContent = availableTests;
+            }
             
             // Calculate from test history
             const historyTable = document.querySelector('.table tbody');
             if (historyTable) {
                 const rows = historyTable.querySelectorAll('tr');
                 const completedTests = rows.length;
-                let totalScore = 0;
-                let totalMarks = 0;
                 
-                rows.forEach(row => {
-                    const scoreText = row.cells[2]?.textContent || '';
-                    const match = scoreText.match(/(\d+)\/(\d+)/);
-                    if (match) {
-                        totalScore += parseInt(match[1]);
-                        totalMarks += parseInt(match[2]);
-                    }
-                });
-                
-                document.getElementById('stat-completed').textContent = completedTests;
-                document.getElementById('stat-total-marks').textContent = totalScore;
-                
-                const avgPercentage = totalMarks > 0 ? Math.round((totalScore / totalMarks) * 100) : 0;
-                document.getElementById('stat-average').textContent = avgPercentage + '%';
-            } else {
-                document.getElementById('stat-completed').textContent = '0';
-                document.getElementById('stat-total-marks').textContent = '0';
-                document.getElementById('stat-average').textContent = '0%';
+                const completedElement = document.getElementById('stat-completed');
+                if (completedElement) {
+                    completedElement.textContent = completedTests;
+                }
             }
         }
         
@@ -324,10 +311,6 @@
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span style="color: var(--text-tertiary); font-size: 0.875rem;">⏱️ Duration:</span>
                                 <span style="font-weight: 600;">${test.duration} minutes</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="color: var(--text-tertiary); font-size: 0.875rem;">📊 Total Marks:</span>
-                                <span style="font-weight: 600;">${test.totalMarks || 'N/A'}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <span style="color: var(--text-tertiary); font-size: 0.875rem;">❓ Questions:</span>
@@ -407,25 +390,18 @@
                                 <th>Test</th>
                                 <th>Start Time</th>
                                 <th>Submit Time</th>
-                                <th>Score</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${formattedAttempts.map(attempt => {
-                                const percentage = ((attempt.totalScore / attempt.maxScore) * 100).toFixed(1);
-                                const statusClass = percentage >= 70 ? 'badge-success' : percentage >= 50 ? 'badge-warning' : 'badge-error';
                                 return `
                                     <tr>
                                         <td style="font-weight: 600;">${attempt.testTitle}</td>
                                         <td>${new Date(attempt.startTime).toLocaleString()}</td>
                                         <td>${new Date(attempt.submitTime).toLocaleString()}</td>
                                         <td>
-                                            <strong>${attempt.totalScore}/${attempt.maxScore}</strong>
-                                            <span style="color: var(--text-tertiary); margin-left: 0.5rem;">(${percentage}%)</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge ${statusClass}">
+                                            <span class="badge badge-success">
                                                 ${attempt.autoSubmitted ? 'Auto-Submitted' : 'Submitted'}
                                             </span>
                                         </td>

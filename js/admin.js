@@ -215,6 +215,7 @@ function displayAttempts(attempts) {
                     <th>Student Name</th>
                     <th>Email</th>
                     <th>Department</th>
+                    <th>Group</th>
                     <th>WhatsApp</th>
                     <th>Test</th>
                     <th>Start Time</th>
@@ -248,6 +249,7 @@ function displayAttempts(attempts) {
                             <td>${attempt.userName}</td>
                             <td>${attempt.userEmail}</td>
                             <td>${attempt.department || 'N/A'}</td>
+                            <td>${attempt.group || 'N/A'}</td>
                             <td>${attempt.whatsapp || 'N/A'}</td>
                             <td>${attempt.testTitle}</td>
                             <td>${new Date(attempt.startTime).toLocaleString()}</td>
@@ -363,7 +365,7 @@ function exportAttempts() {
     
     // Create CSV headers with individual question columns
     const questionHeaders = Array.from({length: maxQuestions}, (_, i) => `Q${i+1} Score`);
-    const headers = ['Student Name', 'Email', 'Department', 'WhatsApp', 'Test', 'Start Time', 'Submit Time', 'Duration (min)', ...questionHeaders, 'Total Score', 'Max Score', 'Percentage', 'Status'];
+    const headers = ['Student Name', 'Email', 'Department', 'Group', 'WhatsApp', 'Test', 'Start Time', 'Submit Time', 'Duration (min)', ...questionHeaders, 'Total Score', 'Max Score', 'Percentage', 'Status'];
     
     const rows = attempts.map(a => {
         // Create question scores array
@@ -378,6 +380,7 @@ function exportAttempts() {
             a.userName,
             a.userEmail,
             a.department || 'N/A',
+            a.group || 'N/A',
             a.whatsapp || 'N/A',
             a.testTitle,
             new Date(a.startTime).toLocaleString(),

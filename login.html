@@ -193,12 +193,25 @@
                         <label for="department">Department:</label>
                         <select id="department" required>
                             <option value="">Select Department</option>
-                            <option value="Computer Science">Computer Science</option>
-                            <option value="Information Technology">Information Technology</option>
-                            <option value="Electronics">Electronics</option>
-                            <option value="Mechanical">Mechanical</option>
-                            <option value="Civil">Civil</option>
-                            <option value="Other">Other</option>
+                            <option value="Computer Science Engineering">Computer Science Engineering</option>
+                            <option value="Electrical Engineering">Electrical Engineering</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                            <option value="Civil Engineering">Civil Engineering</option>
+                            <option value="Chemical Engineering">Chemical Engineering</option>
+                            <option value="Engineering Physics">Engineering Physics</option>
+                            <option value="Other">Others (Please specify)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="other-department-group" style="display: none;">
+                        <label for="other-department">Please specify your department:</label>
+                        <input type="text" id="other-department" placeholder="Enter your department">
+                    </div>
+                    <div class="form-group">
+                        <label for="group">Group:</label>
+                        <select id="group" required>
+                            <option value="">Select Group</option>
+                            <option value="Group A">Group A</option>
+                            <option value="Group B">Group B</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -281,20 +294,47 @@
             }
         });
         
+        // Handle department selection change
+        document.getElementById('department').addEventListener('change', function() {
+            const otherDeptGroup = document.getElementById('other-department-group');
+            const otherDeptInput = document.getElementById('other-department');
+            
+            if (this.value === 'Other') {
+                otherDeptGroup.style.display = 'block';
+                otherDeptInput.required = true;
+            } else {
+                otherDeptGroup.style.display = 'none';
+                otherDeptInput.required = false;
+                otherDeptInput.value = '';
+            }
+        });
+        
         // Additional info form submission
         document.getElementById('user-info-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const tempUser = JSON.parse(sessionStorage.getItem('tempUser'));
             const name = document.getElementById('name').value;
-            const department = document.getElementById('department').value;
+            let department = document.getElementById('department').value;
+            const group = document.getElementById('group').value;
             const whatsapp = document.getElementById('whatsapp').value;
+            
+            // If "Other" is selected, use the custom department input
+            if (department === 'Other') {
+                const otherDepartment = document.getElementById('other-department').value.trim();
+                if (!otherDepartment) {
+                    alert('Please specify your department.');
+                    return;
+                }
+                department = otherDepartment;
+            }
             
             const userData = {
                 email: tempUser.email,
                 name: name,
                 picture: tempUser.picture,
                 department: department,
+                group: group,
                 whatsapp: whatsapp,
                 role: 'student'
             };

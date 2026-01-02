@@ -66,13 +66,16 @@ async function runCode() {
         if (question.testCases && question.testCases.length > 0) {
             const testResults = await runTestCases(code, question.testCases);
             displayTestResults(testResults, result);
+            
+            // Mark as answered if all test cases passed
+            const passedCount = testResults.filter(r => r.passed).length;
+            const totalCount = testResults.length;
+            answers[currentQuestionIndex].answered = (passedCount === totalCount);
         } else {
             output.textContent = result || 'Code executed successfully (no output)';
             output.className = 'output-success';
         }
         
-        // Mark as attempted
-        answers[currentQuestionIndex].attempted = true;
         updateQuestionNavStatus();
         
     } catch (error) {
@@ -380,6 +383,7 @@ async function calculateScores(autoSubmitted) {
         userEmail: user.email,
         userName: user.name,
         department: user.department,
+        group: user.group || 'N/A',
         whatsapp: user.whatsapp,
         startTime: testStartTime,
         submitTime: Date.now(),
@@ -408,19 +412,19 @@ function showResults(attempt) {
     modal.className = 'modal show';
     modal.innerHTML = `
         <div class="modal-content">
-            <h2>${attempt.autoSubmitted ? '⏱️ Time\'s Up!' : '✅ Test Submitted'}</h2>
-            <div class="score-display">${attempt.totalScore}/${attempt.maxScore}</div>
-            <p style="font-size: 1.2rem; color: #666;">
-                Percentage: <strong>${attempt.percentage}%</strong>
-            </p>
-            
-            <div class="results-breakdown">
-                <h3>Question-wise Scores:</h3>
-                ${attempt.questionScores.map(q => `
-                    <div class="question-score">
-                        Q${q.questionNumber}: ${q.score}/${q.maxScore} marks
-                    </div>
-                `).join('')}
+            <h2>✅ Test Submitted Successfully</h2>
+            <div style="text-align: center; padding: 2rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+                <p style="font-size: 1.3rem; color: #10b981; font-weight: 600; margin-bottom: 1rem;">
+                    Your test has been submitted!
+                </p>
+                <p style="font-size: 1.1rem; color: #666; margin-bottom: 2rem;">
+                    ${attempt.autoSubmitted ? 'Your test was automatically submitted when time expired.' : 'Thank you for completing the test.'}
+                </p>
+                <p style="font-size: 0.95rem; color: #888;">
+                    Your responses have been recorded and will be evaluated by the administrator.
+                    Results will be available after evaluation.
+                </p>
             </div>
             
             <button onclick="window.location.href='student-dashboard.html'" class="btn btn-primary">

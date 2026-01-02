@@ -63,6 +63,20 @@ function initTest() {
         return;
     }
     
+    // Shuffle questions: keep first 4 in order, shuffle remaining
+    if (currentTest.questions.length > 4) {
+        const firstFour = currentTest.questions.slice(0, 4);
+        const remaining = currentTest.questions.slice(4);
+        
+        // Fisher-Yates shuffle algorithm
+        for (let i = remaining.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+        }
+        
+        currentTest.questions = [...firstFour, ...remaining];
+    }
+    
     // Show camera recording warning
     showCameraRecordingWarning();
     
@@ -72,7 +86,8 @@ function initTest() {
             code: q.type === 'code' ? (q.starterCode || '') : '',
             output: '',
             score: 0,
-            attempted: false
+            markedForReview: false,
+            answered: false
         };
     });
     
@@ -137,12 +152,18 @@ function generateQuestionNav() {
 function updateQuestionNavStatus() {
     const buttons = document.querySelectorAll('.question-btn');
     buttons.forEach((btn, index) => {
-        btn.classList.remove('active', 'answered', 'attempted');
+        btn.classList.remove('active', 'answered', 'marked');
         
+        // Prioritize answered status (green) over marked for review
+        if (answers[index] && answers[index].answered) {
+            btn.classList.add('answered');
+        } else if (answers[index] && answers[index].markedForReview) {
+            btn.classList.add('marked');
+        }
+        
+        // Add active class if current question (but answered/marked color takes precedence in CSS)
         if (index === currentQuestionIndex) {
             btn.classList.add('active');
-        } else if (answers[index].attempted) {
-            btn.classList.add('attempted');
         }
     });
 }
@@ -160,7 +181,6 @@ function showQuestion(index) {
         <div class="question-content">
             <div class="question-header">
                 <span class="question-number">Question ${index + 1} of ${currentTest.questions.length}</span>
-                <span class="question-marks">${question.marks} Marks</span>
             </div>
             
             <div class="question-text">${formatQuestionText(question.text)}</div>
@@ -188,6 +208,20 @@ function showQuestion(index) {
     // Update navigation buttons
     updateQuestionNavStatus();
     updateNavigationButtons();
+    
+    // Update mark for review button state for the current question
+    const markBtn = document.getElementById('mark-review-btn');
+    if (markBtn && answers[currentQuestionIndex]) {
+        const isMarked = answers[currentQuestionIndex].markedForReview || false;
+        if (isMarked) {
+            markBtn.textContent = '✓ Marked for Review';
+            markBtn.classList.add('marked');
+        } else {
+            markBtn.textContent = '🔖 Mark for Review';
+            markBtn.classList.remove('marked');
+        }
+        console.log(`Question ${currentQuestionIndex + 1} review status:`, isMarked);
+    }
     
     // Set user watermark
     setUserWatermark();
@@ -227,8 +261,37 @@ function saveCurrentAnswer() {
     const editor = document.getElementById('code-editor');
     if (editor) {
         answers[currentQuestionIndex].code = editor.value;
-        answers[currentQuestionIndex].attempted = editor.value.trim() !== '';
     }
+}
+
+// Mark question for review
+function markForReview() {
+    if (!answers[currentQuestionIndex]) {
+        console.error('Current question answer object not found');
+        return;
+    }
+    
+    saveCurrentAnswer();
+    
+    // Toggle the marked for review status
+    answers[currentQuestionIndex].markedForReview = !answers[currentQuestionIndex].markedForReview;
+    
+    console.log(`Question ${currentQuestionIndex + 1} marked for review:`, answers[currentQuestionIndex].markedForReview);
+    
+    // Update the button appearance
+    const btn = document.getElementById('mark-review-btn');
+    if (btn) {
+        if (answers[currentQuestionIndex].markedForReview) {
+            btn.textContent = '✓ Marked for Review';
+            btn.classList.add('marked');
+        } else {
+            btn.textContent = '🔖 Mark for Review';
+            btn.classList.remove('marked');
+        }
+    }
+    
+    // Update the question palette
+    updateQuestionNavStatus();
 }
 
 // Previous question
@@ -377,7 +440,7 @@ function toggleSidebar() {
 
 // Confirm submit with dialog
 function confirmSubmit() {
-    const unansweredCount = Object.keys(answers).filter(key => !answers[key].attempted).length;
+    const unansweredCount = Object.keys(answers).filter(key => !answers[key].code || answers[key].code.trim() === '').length;
     const totalQuestions = currentTest.questions.length;
     const answeredCount = totalQuestions - unansweredCount;
     

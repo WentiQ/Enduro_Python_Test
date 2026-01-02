@@ -213,7 +213,7 @@ html, body {
     box-shadow: 0 0 0 3px var(--success-light);
 }
 
-.legend-box.attempted {
+.legend-box.marked {
     background: var(--warning);
     border-color: var(--warning);
     box-shadow: 0 0 0 3px var(--warning-light);
@@ -289,15 +289,17 @@ html, body {
 }
 
 .question-grid button.answered {
-    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
-    color: white;
-    border-color: var(--success);
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%) !important;
+    color: white !important;
+    border-color: var(--success) !important;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3) !important;
 }
 
-.question-grid button.attempted {
-    background: var(--warning-light);
-    border-color: var(--warning);
-    color: var(--warning);
+.question-grid button.marked {
+    background: var(--warning-light) !important;
+    border-color: var(--warning) !important;
+    color: var(--warning) !important;
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2) !important;
 }
 
 /* === TEST CONTENT === */
@@ -434,6 +436,29 @@ html, body {
 .navigation-buttons .btn-success:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 24px rgba(16, 185, 129, 0.3);
+}
+
+.navigation-buttons .btn-warning {
+    background: linear-gradient(135deg, #fff 0%, #fef3c7 100%);
+    color: var(--warning);
+    border: 2px solid var(--warning);
+    font-weight: 600;
+}
+
+.navigation-buttons .btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(245, 158, 11, 0.3);
+}
+
+.navigation-buttons .btn-warning.marked {
+    background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+    color: white;
+    border: 2px solid var(--warning);
+}
+
+.navigation-buttons .btn-warning.marked:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(245, 158, 11, 0.4);
 }
 
 .btn-submit {

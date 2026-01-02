@@ -39,8 +39,8 @@
                 <span>Answered</span>
             </div>
             <div class="legend-item">
-                <span class="legend-box attempted"></span>
-                <span>Attempted</span>
+                <span class="legend-box marked"></span>
+                <span>Marked for Review</span>
             </div>
             <div class="legend-item">
                 <span class="legend-box not-visited"></span>
@@ -78,6 +78,7 @@
                 
                 <div class="navigation-buttons">
                     <button id="prev-btn" onclick="previousQuestion()" class="btn btn-secondary">Previous</button>
+                    <button id="mark-review-btn" onclick="markForReview()" class="btn btn-warning">🔖 Mark for Review</button>
                     <button id="next-btn" onclick="nextQuestion()" class="btn btn-primary">Next</button>
                     <button onclick="confirmSubmit()" class="btn btn-success">Submit Test</button>
                 </div>
