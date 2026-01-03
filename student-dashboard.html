@@ -281,8 +281,20 @@
         }
         
         async function loadAvailableTests() {
-            const tests = await getAllTests();
+            const allTests = await getAllTests();
             const container = document.getElementById('available-tests');
+            
+            // Filter out tests that are outside their time range
+            const now = new Date();
+            const tests = allTests.filter(test => {
+                const startDateTime = test.startDateTime || (test.startDate + 'T00:00');
+                const endDateTime = test.endDateTime || (test.endDate + 'T23:59');
+                const start = new Date(startDateTime);
+                const end = new Date(endDateTime);
+                
+                // Only show tests that are currently within their time range
+                return now >= start && now <= end;
+            });
             
             if (tests.length === 0) {
                 container.innerHTML = `

@@ -793,60 +793,33 @@
     <script src="data/questions.js"></script>
     
     <script type="module">
-        import { onAuthStateChanged, signOut, isDemoUser, getDemoUser } from './js/firebase-auth.js';
-        import { getAllUsers, getUsersByRole, getAllTests, getAllTestAttempts, createTest, updateTest, deleteTest } from './js/firebase-database.js';
-        
         let currentUser = null;
         
+        // Helper functions to work with localStorage (no authentication required)
+        function getAllUsers() {
+            return JSON.parse(localStorage.getItem('users') || '[]');
+        }
+        
+        function getAllTests() {
+            return JSON.parse(localStorage.getItem('tests') || '[]');
+        }
+        
+        function getAllTestAttempts() {
+            return JSON.parse(localStorage.getItem('testAttempts') || '[]');
+        }
+        
         async function initAdminDashboard() {
-            // Check for demo user
-            if (isDemoUser()) {
-                currentUser = getDemoUser();
-                
-                // Ensure user is admin
-                if (currentUser.role !== 'admin') {
-                    alert('Access denied. Admin credentials required.');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                
-                document.getElementById('admin-name').textContent = currentUser.name;
-                showTab('overview');
-                loadDashboardStats();
-                return;
-            }
+            // Create default admin user
+            currentUser = {
+                name: 'Administrator',
+                email: 'admin@enduro.com',
+                role: 'admin',
+                department: 'Administration'
+            };
             
-            // Check Firebase auth
-            onAuthStateChanged(async (user) => {
-                if (!user) {
-                    console.log('No Firebase user, redirecting to login');
-                    window.location.href = 'login.html?admin=true';
-                    return;
-                }
-                
-                // Get user data from session
-                const userJson = sessionStorage.getItem('currentUser');
-                if (userJson) {
-                    currentUser = JSON.parse(userJson);
-                    console.log('Current admin user:', currentUser);
-                } else {
-                    console.log('No user in session, redirecting to login');
-                    window.location.href = 'login.html?admin=true';
-                    return;
-                }
-                
-                // Ensure user is admin
-                if (currentUser.role !== 'admin') {
-                    console.log('User is not admin, redirecting');
-                    alert('Access denied. Admin credentials required.');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                
-                document.getElementById('admin-name').textContent = currentUser.name;
-                showTab('overview');
-                loadDashboardStats();
-            });
+            document.getElementById('admin-name').textContent = currentUser.name;
+            showTab('overview');
+            loadDashboardStats();
         }
         
         window.showTab = function(tabName) {
@@ -890,12 +863,12 @@
         async function loadDashboardStats() {
             try {
                 // Load students
-                const students = await getAllUsers();
+                const students = getAllUsers();
                 const studentUsers = students.filter(u => u.role === 'student');
                 document.getElementById('total-students').textContent = studentUsers.length;
                 
                 // Load attempts
-                const attempts = await getAllTestAttempts();
+                const attempts = getAllTestAttempts();
                 document.getElementById('total-attempts').textContent = attempts.length;
                 
                 // Calculate average score
@@ -908,26 +881,21 @@
                 }
                 
                 // Load tests
-                const tests = await getAllTests();
+                const tests = getAllTests();
                 document.getElementById('total-tests').textContent = tests.length;
             } catch (error) {
                 console.error('Error loading dashboard stats:', error);
             }
         }
         
-        window.logout = async function() {
-            if (isDemoUser()) {
-                sessionStorage.removeItem('demoUser');
-            } else {
-                await signOut();
-            }
+        window.logout = function() {
             sessionStorage.removeItem('currentUser');
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         };
         
         // Load the admin.js functionality
         const script = document.createElement('script');
-        script.src = 'js/admin.js';
+        script.src = 'js/admin.js?v=' + Date.now();
         document.body.appendChild(script);
         
         // Initialize test questions

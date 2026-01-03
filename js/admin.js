@@ -231,15 +231,29 @@ function displayAttempts(attempts) {
                 ${attempts.map(attempt => {
                     const scoreClass = attempt.percentage >= 70 ? 'score-good' : 
                                       attempt.percentage >= 40 ? 'score-medium' : 'score-poor';
-                    const statusClass = attempt.autoSubmitted ? 'status-auto' : 'status-submitted';
+                    const statusClass = attempt.leftInMiddle ? 'status-left' : (attempt.autoSubmitted ? 'status-auto' : 'status-submitted');
                     
-                    // Generate individual question marks cells
+                    // Sort questions by original index for display
+                    const sortedQuestionScores = attempt.questionScores 
+                        ? [...attempt.questionScores].sort((a, b) => {
+                            const aIdx = a.originalIndex !== undefined ? a.originalIndex : a.questionNumber - 1;
+                            const bIdx = b.originalIndex !== undefined ? b.originalIndex : b.questionNumber - 1;
+                            return aIdx - bIdx;
+                        })
+                        : [];
+                    
+                    // Generate individual question marks cells in original order
                     const questionCells = Array.from({length: maxQuestions}, (_, i) => {
-                        if (attempt.questionScores && attempt.questionScores[i]) {
-                            const qs = attempt.questionScores[i];
+                        const qs = sortedQuestionScores[i];
+                        if (qs) {
+                            console.log(`Original Q${i+1}: passedTestCases=${qs.passedTestCases}, totalTestCases=${qs.totalTestCases}`);
                             const qScoreClass = qs.score === qs.maxScore ? 'score-good' : 
                                                qs.score >= qs.maxScore * 0.5 ? 'score-medium' : 'score-poor';
-                            return `<td class="${qScoreClass}" style="text-align: center;">${qs.score}/${qs.maxScore}</td>`;
+                            // Handle both old and new format
+                            const testCaseInfo = (qs.totalTestCases !== undefined && qs.totalTestCases > 0) 
+                                ? `<br><small style="font-size:0.75em">(${qs.passedTestCases || 0}/${qs.totalTestCases} TC)</small>` 
+                                : '';
+                            return `<td class="${qScoreClass}" style="text-align: center;">${qs.score}/${qs.maxScore}${testCaseInfo}</td>`;
                         }
                         return `<td style="text-align: center;">-</td>`;
                     }).join('');
@@ -262,7 +276,7 @@ function displayAttempts(attempts) {
                             </td>
                             <td>
                                 <span class="status-badge ${statusClass}">
-                                    ${attempt.autoSubmitted ? 'Auto-Submitted' : 'Submitted'}
+                                    ${attempt.leftInMiddle ? '⚠️ Left in Middle' : (attempt.autoSubmitted ? 'Auto-Submitted' : 'Submitted')}
                                 </span>
                             </td>
                             <td>
@@ -323,20 +337,29 @@ function showAttemptDetails(attempt) {
                 <p><strong>Start Time:</strong> ${new Date(attempt.startTime).toLocaleString()}</p>
                 <p><strong>Submit Time:</strong> ${new Date(attempt.submitTime).toLocaleString()}</p>
                 <p><strong>Duration:</strong> ${attempt.elapsedMinutes} minutes</p>
-                <p><strong>Status:</strong> ${attempt.autoSubmitted ? 'Auto-Submitted (Time Up)' : 'Manually Submitted'}</p>
+                <p><strong>Status:</strong> ${attempt.leftInMiddle ? '⚠️ Left in Middle (Back Button)' : (attempt.autoSubmitted ? 'Auto-Submitted (Time Up)' : 'Manually Submitted')}</p>
+                ${attempt.leftInMiddle ? '<p style="color: #dc3545; font-weight: 600;">⚠️ Student attempted to leave the test before submitting</p>' : ''}
             </div>
             
             <div class="results-breakdown">
                 <h3>Score Summary</h3>
                 <p><strong>Total Score:</strong> ${attempt.totalScore}/${attempt.maxScore} (${attempt.percentage}%)</p>
                 
-                <h4>Question-wise Scores:</h4>
-                ${attempt.questionScores.map(q => `
-                    <div class="question-score">
-                        <strong>Question ${q.questionNumber}:</strong> ${q.score}/${q.maxScore} marks
-                        <br><small>${q.questionText}</small>
-                    </div>
-                `).join('')}
+                <h4>Question-wise Scores (Original Order):</h4>
+                ${attempt.questionScores
+                    .sort((a, b) => (a.originalIndex !== undefined ? a.originalIndex : a.questionNumber - 1) - (b.originalIndex !== undefined ? b.originalIndex : b.questionNumber - 1))
+                    .map((q, idx) => {
+                        const displayNum = q.originalIndex !== undefined ? q.originalIndex + 1 : q.questionNumber;
+                        const testCaseInfo = (q.totalTestCases !== undefined && q.totalTestCases > 0) 
+                            ? `<br><small style="color: #666;">Test Cases Passed: ${q.passedTestCases || 0}/${q.totalTestCases}</small>` 
+                            : '';
+                        return `
+                            <div class="question-score">
+                                <strong>Question ${displayNum}:</strong> ${q.score}/${q.maxScore} marks${testCaseInfo}
+                                <br><small>${q.questionText}</small>
+                            </div>
+                        `;
+                    }).join('')}
             </div>
             
             <button onclick="this.parentElement.parentElement.remove()" class="btn btn-primary">
@@ -390,7 +413,7 @@ function exportAttempts() {
             a.totalScore,
             a.maxScore,
             a.percentage + '%',
-            a.autoSubmitted ? 'Auto-Submitted' : 'Submitted'
+            a.leftInMiddle ? 'Left in Middle' : (a.autoSubmitted ? 'Auto-Submitted' : 'Submitted')
         ];
     });
     

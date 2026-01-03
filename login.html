@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In - Python Test Platform</title>
+    <title>Sign In - Enduro</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
@@ -169,7 +169,7 @@
         <div class="login-card">
             <div class="login-header">
                 <h1 class="login-title">Welcome Back</h1>
-                <p class="login-subtitle" id="login-message">Sign in to continue to your dashboard</p>
+                <p class="login-subtitle" id="login-message">Sign in to continue to your test</p>
             </div>
             
             <button id="google-signin-btn" class="btn btn-primary google-btn">
@@ -284,8 +284,8 @@
                         console.log('Redirecting to admin dashboard');
                         window.location.href = 'admin-dashboard.html';
                     } else {
-                        console.log('Redirecting to student dashboard');
-                        window.location.href = 'student-dashboard.html';
+                        console.log('Redirecting to test page');
+                        window.location.href = 'test.html';
                     }
                 }
             } catch (error) {
@@ -345,7 +345,7 @@
                 sessionStorage.setItem('currentUser', JSON.stringify({ ...userData, uid: tempUser.uid }));
                 sessionStorage.removeItem('tempUser');
                 
-                window.location.href = 'student-dashboard.html';
+                window.location.href = 'test.html';
             } catch (error) {
                 console.error('Error creating user:', error);
                 alert('Failed to create account. Please try again.');

@@ -3,207 +3,404 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Test Platform - Professional Assessment Center</title>
+    <title>Enduro — Professional Testing Platform</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        .hero-section {
-            min-height: 70vh;
+        /* Professional Navigation */
+        .main-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #E5E7EB;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+        
+        .nav-logo {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #0F172A;
+            text-transform: uppercase;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        /* Hero Section - Ultra Professional */
+        .hero-section {
+            min-height: 90vh;
+            display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 50%, #F1F5F9 100%);
-            padding: 4rem 2rem;
-            position: relative;
-            overflow: hidden;
+            padding: 8rem 2rem 6rem;
+            background: #FFFFFF;
+            margin-top: 80px;
         }
         
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
-            top: -200px;
-            right: -200px;
-            animation: float 6s ease-in-out infinite;
+        .hero-container {
+            max-width: 1100px;
+            margin: 0 auto;
         }
         
-        .hero-section::after {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
-            bottom: -150px;
-            left: -150px;
-            animation: float 8s ease-in-out infinite reverse;
+        .hero-content {
+            text-align: left;
+            max-width: 720px;
         }
         
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(5deg); }
+        .hero-label {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748B;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #0F172A;
         }
         
         .hero-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: slideDown 0.6s ease-out;
-            position: relative;
-            z-index: 1;
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            color: #0F172A;
+            margin-bottom: 2rem;
         }
         
         .hero-subtitle {
             font-size: 1.25rem;
-            color: var(--text-secondary);
+            line-height: 1.7;
+            color: #475569;
             margin-bottom: 3rem;
-            max-width: 600px;
-            animation: slideUp 0.6s ease-out 0.2s both;
-            position: relative;
-            z-index: 1;
+            font-weight: 400;
         }
         
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
+        .hero-actions {
+            display: flex;
+            gap: 1.25rem;
         }
         
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            border-radius: 0;
+            letter-spacing: 0.02em;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary-pro {
+            background: #0F172A;
+            color: #FFFFFF;
+            border: 2px solid #0F172A;
+        }
+        
+        .btn-primary-pro:hover {
+            background: #1E293B;
+            border-color: #1E293B;
+        }
+        
+        .btn-secondary-pro {
+            background: transparent;
+            color: #0F172A;
+            border: 2px solid #0F172A;
+        }
+        
+        .btn-secondary-pro:hover {
+            background: #0F172A;
+            color: #FFFFFF;
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            background: #F8FAFC;
+            padding: 5rem 2rem;
+            border-top: 1px solid #E5E7EB;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .stats-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Features Section - Minimalist Grid */
+        .features-section {
+            padding: 6rem 2rem;
+            background: #FFFFFF;
+        }
+        
+        .features-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            max-width: 720px;
+            margin-bottom: 5rem;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .section-description {
+            font-size: 1.125rem;
+            color: #475569;
+            line-height: 1.7;
         }
         
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2.5rem;
-            padding: 4rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
         }
         
-        .feature-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: var(--radius-xl);
-            padding: 2.5rem;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: fadeIn 0.6s ease-out;
-            animation-fill-mode: both;
+        .feature-item {
+            padding: 0;
         }
         
-        .feature-card:nth-child(1) { animation-delay: 0.3s; }
-        .feature-card:nth-child(2) { animation-delay: 0.4s; }
-        .feature-card:nth-child(3) { animation-delay: 0.5s; }
-        
-        .feature-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px -12px rgba(37, 99, 235, 0.2);
-            border-color: var(--accent);
-        }
-        
-        .feature-icon {
-            font-size: 3rem;
+        .feature-number {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94A3B8;
+            letter-spacing: 0.1em;
             margin-bottom: 1.5rem;
-            display: inline-block;
-            transition: transform 0.3s;
-        }
-        
-        .feature-card:hover .feature-icon {
-            transform: scale(1.1) rotate(5deg);
         }
         
         .feature-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0F172A;
             margin-bottom: 1rem;
-            color: var(--text-primary);
+            letter-spacing: -0.01em;
         }
         
-        .feature-desc {
-            color: var(--text-secondary);
+        .feature-description {
+            font-size: 0.9375rem;
+            color: #64748B;
             line-height: 1.7;
         }
         
+        /* CTA Section - Sophisticated */
         .cta-section {
+            background: #0F172A;
+            padding: 6rem 2rem;
             text-align: center;
-            padding: 4rem 2rem;
-            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
         }
         
-        .cta-buttons {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            animation: slideUp 0.6s ease-out 0.6s both;
+        .cta-container {
+            max-width: 720px;
+            margin: 0 auto;
         }
         
-        .btn-large {
-            padding: 1rem 2.5rem;
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .cta-description {
             font-size: 1.125rem;
-            font-weight: 600;
-            min-width: 200px;
+            color: #94A3B8;
+            margin-bottom: 3rem;
+            line-height: 1.7;
         }
         
-        footer {
+        .cta-button {
+            background: #FFFFFF;
+            color: #0F172A;
+            border: 2px solid #FFFFFF;
+            padding: 1rem 2.5rem;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            border-radius: 0;
+            letter-spacing: 0.02em;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+        
+        .cta-button:hover {
+            background: transparent;
+            color: #FFFFFF;
+        }
+        
+        /* Footer - Minimal */
+        .main-footer {
+            background: #0F172A;
+            padding: 2rem;
             text-align: center;
-            padding: 2.5rem;
-            background: var(--primary);
-            color: var(--text-inverse);
-            font-size: 0.9rem;
+            border-top: 1px solid #1E293B;
         }
         
+        .footer-text {
+            font-size: 0.875rem;
+            color: #64748B;
+            letter-spacing: 0.02em;
+        }
+        
+        .footer-link {
+            color: #94A3B8;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .footer-link:hover {
+            color: #FFFFFF;
+        }
+        
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .hero-title { font-size: 2.5rem; }
-            .hero-subtitle { font-size: 1.1rem; }
-            .features-grid { grid-template-columns: 1fr; }
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            
+            .nav-actions {
+                gap: 0.5rem;
+            }
+            
+            .btn-large {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.875rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="hero-section">
-        <h1 class="hero-title">Python Test Platform</h1>
-        <p class="hero-subtitle">Master Python programming through comprehensive timed assessments with detailed analytics and evaluation</p>
-        <div class="cta-buttons">
-            <a href="login.html" class="btn btn-primary btn-large">Get Started</a>
-            <a href="login.html?admin=true" class="btn btn-secondary btn-large">Admin Portal</a>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">Enduro</div>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-primary-pro">Sign In</a>
+            </div>
         </div>
-    </div>
-    
-    <div class="features-grid">
-        <div class="feature-card">
-            <div class="feature-icon">⏱️</div>
-            <h3 class="feature-title">Timed Assessments</h3>
-            <p class="feature-desc">Complete challenging Python tests within structured time windows, simulating real-world pressure scenarios</p>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <span class="hero-label">Welcome to Enduro</span>
+                <h1 class="hero-title">Organizing Professional Testing</h1>
+                <p class="hero-subtitle">Comprehensive skill evaluation system designed for organizations seeking to assess technical proficiency through standardized, timed assessments with real-time code execution and detailed performance analytics.</p>
+                <div class="hero-actions">
+                    <a href="login.html" class="btn btn-large btn-primary-pro">Begin Test</a>
+                </div>
+            </div>
         </div>
-        <div class="feature-card">
-            <div class="feature-icon">🔍</div>
-            <h3 class="feature-title">Live Code Execution</h3>
-            <p class="feature-desc">Run your code against comprehensive test cases with immediate feedback during your test session</p>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-number">99.9%</div>
+                <div class="stat-label">Uptime Reliability</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">< 100ms</div>
+                <div class="stat-label">Code Execution</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Platform Access</div>
+            </div>
         </div>
-        <div class="feature-card">
-            <div class="feature-icon">📊</div>
-            <h3 class="feature-title">Detailed Analytics</h3>
-            <p class="feature-desc">Track your progress with comprehensive performance metrics, question-level insights, and historical data</p>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="features-container">
+            <div class="section-header">
+                <h2 class="section-title">Enterprise-grade testing capabilities</h2>
+                <p class="section-description">A comprehensive platform built for technical evaluation with institutional-level security and precision.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-number">01</div>
+                    <h3 class="feature-title">Timed Tests</h3>
+                    <p class="feature-description">Structured evaluation windows with precise time management, designed to measure performance under standardized conditions.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-number">02</div>
+                    <h3 class="feature-title">Real-Time Execution</h3>
+                    <p class="feature-description">Immediate code validation against comprehensive test suites with instant feedback mechanisms and error reporting.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-number">03</div>
+                    <h3 class="feature-title">Advanced Analytics</h3>
+                    <p class="feature-description">Granular performance metrics with historical tracking, question-level analysis, and detailed competency mapping.</p>
+                </div>
+            </div>
         </div>
-    </div>
-    
-    <div class="cta-section">
-        <h2 style="margin-bottom: 1.5rem; font-size: 2rem;">Ready to test your skills?</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Join thousands of developers improving their Python expertise</p>
-        <a href="login.html" class="btn btn-primary btn-large">Start Testing Now</a>
-    </div>
-    
-    <footer>
-        <p>&copy; 2026 Python Test Platform. All rights reserved.</p>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2 class="cta-title">Ready to evaluate technical proficiency?</h2>
+            <p class="cta-description">Access the platform to begin standardized Python assessment procedures.</p>
+            <a href="login.html" class="cta-button">Access Platform</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p class="footer-text">© 2026 Enduro. All rights reserved. | <a href="admin-dashboard.html" class="footer-link">Admin Portal</a></p>
     </footer>
 </body>
 </html>

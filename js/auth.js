@@ -66,7 +66,7 @@ function handleCredentialResponse(response) {
             if (user.role === 'admin') {
                 window.location.href = 'admin-dashboard.html';
             } else {
-                window.location.href = 'student-dashboard.html';
+                window.location.href = 'test.html';
             }
         }
     } catch (error) {
@@ -108,8 +108,8 @@ document.addEventListener('DOMContentLoaded', function() {
             sessionStorage.setItem('currentUser', JSON.stringify(newUser));
             sessionStorage.removeItem('tempUser');
             
-            // Redirect to dashboard
-            window.location.href = 'student-dashboard.html';
+            // Redirect to test
+            window.location.href = 'test.html';
         });
     }
 });
@@ -194,7 +194,7 @@ function demoLogin(role = 'student') {
             localStorage.setItem('users', JSON.stringify(users));
         }
         sessionStorage.setItem('currentUser', JSON.stringify(student));
-        window.location.href = 'student-dashboard.html';
+        window.location.href = 'test.html';
     }
 }
 

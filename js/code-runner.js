@@ -67,13 +67,18 @@ async function runCode() {
             const testResults = await runTestCases(code, question.testCases);
             displayTestResults(testResults, result);
             
-            // Mark as answered if all test cases passed
+            // Mark as answered if at least 1 test case passed
             const passedCount = testResults.filter(r => r.passed).length;
             const totalCount = testResults.length;
-            answers[currentQuestionIndex].answered = (passedCount === totalCount);
+            answers[currentQuestionIndex].answered = passedCount > 0;
+            answers[currentQuestionIndex].score = Math.round((passedCount / totalCount) * 100);
         } else {
             output.textContent = result || 'Code executed successfully (no output)';
             output.className = 'output-success';
+            
+            // Mark as answered for questions without test cases if code is written
+            const starterCode = question.starterCode || '';
+            answers[currentQuestionIndex].answered = code.trim() !== '' && code.trim() !== starterCode.trim();
         }
         
         updateQuestionNavStatus();
@@ -330,13 +335,17 @@ function escapeHtml(text) {
 }
 
 // Calculate final scores
-async function calculateScores(autoSubmitted) {
+async function calculateScores(autoSubmitted, leftInMiddle = false) {
     const user = getCurrentUser();
     
-    // Run all test cases one final time
+    // Run all test cases one final time and store results
+    const questionResults = [];
+    
     for (let i = 0; i < currentTest.questions.length; i++) {
         const question = currentTest.questions[i];
         const answer = answers[i];
+        let passedCount = 0;
+        let totalCount = 0;
         
         if (question.type === 'code' && answer.code.trim() && question.testCases) {
             try {
@@ -346,15 +355,22 @@ async function calculateScores(autoSubmitted) {
                 
                 if (pyodideReady) {
                     const testResults = await runTestCases(answer.code, question.testCases);
-                    const passedCount = testResults.filter(r => r.passed).length;
-                    const totalCount = testResults.length;
+                    passedCount = testResults.filter(r => r.passed).length;
+                    totalCount = testResults.length;
                     answer.score = (passedCount / totalCount) * question.marks;
                 }
             } catch (error) {
                 console.error(`Error evaluating question ${i + 1}:`, error);
                 answer.score = 0;
+                totalCount = question.testCases?.length || 0;
             }
         }
+        
+        questionResults.push({
+            originalIndex: question.originalIndex !== undefined ? question.originalIndex : i,
+            passedTestCases: passedCount,
+            totalTestCases: totalCount
+        });
     }
     
     // Calculate total score
@@ -367,13 +383,20 @@ async function calculateScores(autoSubmitted) {
         totalScore += score;
         maxScore += q.marks;
         
+        const result = questionResults[index];
+        
         questionScores.push({
             questionNumber: index + 1,
+            originalIndex: q.originalIndex !== undefined ? q.originalIndex : index,
             questionText: q.text.substring(0, 100) + '...',
-            score: score,
-            maxScore: q.marks
+            score: Math.round(score * 100) / 100,
+            maxScore: q.marks,
+            passedTestCases: result.passedTestCases,
+            totalTestCases: result.totalTestCases
         });
     });
+    
+    console.log('Question Scores with Test Cases:', questionScores);
     
     // Save test attempt
     const attempt = {
@@ -390,6 +413,7 @@ async function calculateScores(autoSubmitted) {
         duration: currentTest.duration,
         elapsedMinutes: getElapsedTime(),
         autoSubmitted: autoSubmitted,
+        leftInMiddle: leftInMiddle,
         totalScore: Math.round(totalScore * 100) / 100,
         maxScore: maxScore,
         percentage: Math.round((totalScore / maxScore) * 100),
@@ -427,8 +451,8 @@ function showResults(attempt) {
                 </p>
             </div>
             
-            <button onclick="window.location.href='student-dashboard.html'" class="btn btn-primary">
-                Back to Dashboard
+            <button onclick="window.location.href='index.html'" class="btn btn-primary">
+                Back to Home
             </button>
         </div>
     `;

@@ -16,21 +16,53 @@ function initTest() {
         return;
     }
     
-    // Get test ID from URL
+    // Get test ID from URL or load first available test
     const urlParams = new URLSearchParams(window.location.search);
-    const testId = urlParams.get('testId');
+    let testId = urlParams.get('testId');
     
+    // If no testId provided, try to load the first available test
     if (!testId) {
-        alert('Invalid test ID');
-        window.location.href = 'student-dashboard.html';
-        return;
+        const tests = JSON.parse(localStorage.getItem('tests') || '[]');
+        
+        // Find first active test
+        const now = new Date();
+        const activeTest = tests.find(t => {
+            const startDateTime = t.startDateTime || (t.startDate + 'T00:00');
+            const endDateTime = t.endDateTime || (t.endDate + 'T23:59');
+            const start = new Date(startDateTime);
+            const end = new Date(endDateTime);
+            return now >= start && now <= end;
+        });
+        
+        if (activeTest) {
+            testId = activeTest.id;
+            // Update URL without reloading
+            window.history.replaceState({}, '', `test.html?testId=${testId}`);
+        } else {
+            // No active tests, create a default test
+            const defaultTestId = 'default-test-' + Date.now();
+            const defaultTest = {
+                id: defaultTestId,
+                title: 'Enduro Python Test',
+                description: 'Test your Python programming skills',
+                duration: 60,
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0],
+                questions: getDefaultQuestions()
+            };
+            
+            tests.push(defaultTest);
+            localStorage.setItem('tests', JSON.stringify(tests));
+            testId = defaultTestId;
+            window.history.replaceState({}, '', `test.html?testId=${testId}`);
+        }
     }
     
     // Load test
     currentTest = loadTest(testId);
     if (!currentTest) {
         alert('Test not found');
-        window.location.href = 'student-dashboard.html';
+        window.location.href = 'login.html';
         return;
     }
     
@@ -43,13 +75,13 @@ function initTest() {
     
     if (now < start) {
         alert('This test is not yet available. It will start on ' + start.toLocaleString());
-        window.location.href = 'student-dashboard.html';
+        window.location.href = 'index.html';
         return;
     }
     
     if (now > end) {
         alert('This test has ended. It was available until ' + end.toLocaleString());
-        window.location.href = 'student-dashboard.html';
+        window.location.href = 'index.html';
         return;
     }
     
@@ -59,14 +91,14 @@ function initTest() {
     
     if (alreadyAttempted) {
         alert('You have already attempted this test.');
-        window.location.href = 'student-dashboard.html';
+        window.location.href = 'index.html';
         return;
     }
     
     // Shuffle questions: keep first 4 in order, shuffle remaining
     if (currentTest.questions.length > 4) {
-        const firstFour = currentTest.questions.slice(0, 4);
-        const remaining = currentTest.questions.slice(4);
+        const firstFour = currentTest.questions.slice(0, 4).map((q, i) => ({...q, originalIndex: i}));
+        const remaining = currentTest.questions.slice(4).map((q, i) => ({...q, originalIndex: i + 4}));
         
         // Fisher-Yates shuffle algorithm
         for (let i = remaining.length - 1; i > 0; i--) {
@@ -75,6 +107,9 @@ function initTest() {
         }
         
         currentTest.questions = [...firstFour, ...remaining];
+    } else {
+        // If 4 or fewer questions, just add original index
+        currentTest.questions = currentTest.questions.map((q, i) => ({...q, originalIndex: i}));
     }
     
     // Show camera recording warning
@@ -209,20 +244,6 @@ function showQuestion(index) {
     updateQuestionNavStatus();
     updateNavigationButtons();
     
-    // Update mark for review button state for the current question
-    const markBtn = document.getElementById('mark-review-btn');
-    if (markBtn && answers[currentQuestionIndex]) {
-        const isMarked = answers[currentQuestionIndex].markedForReview || false;
-        if (isMarked) {
-            markBtn.textContent = '✓ Marked for Review';
-            markBtn.classList.add('marked');
-        } else {
-            markBtn.textContent = '🔖 Mark for Review';
-            markBtn.classList.remove('marked');
-        }
-        console.log(`Question ${currentQuestionIndex + 1} review status:`, isMarked);
-    }
-    
     // Set user watermark
     setUserWatermark();
     
@@ -234,6 +255,22 @@ function showQuestion(index) {
             enableAutoResize(editor);
         }
     }, 100);
+    
+    // CRITICAL: Update mark for review button AFTER everything else
+    // Force immediate DOM update
+    const markBtn = document.getElementById('mark-review-btn');
+    if (markBtn && answers[currentQuestionIndex]) {
+        // Remove the marked class first to reset state
+        markBtn.classList.remove('marked');
+        
+        // Check current question's marked status
+        if (answers[currentQuestionIndex].markedForReview === true) {
+            markBtn.textContent = '✓ Marked for Review';
+            markBtn.classList.add('marked');
+        } else {
+            markBtn.textContent = '🔖 Mark for Review';
+        }
+    }
 }
 
 // Enable auto-resize for textarea (VSCode-like behavior)
@@ -256,6 +293,25 @@ function autoResizeTextarea(textarea) {
 
 // Format question text removed - now using anti-OCR version below
 
+// Update mark for review button based on current question state
+function updateMarkForReviewButton() {
+    const markBtn = document.getElementById('mark-review-btn');
+    if (!markBtn || !answers[currentQuestionIndex]) {
+        return;
+    }
+    
+    // ALWAYS remove marked class first to reset state
+    markBtn.classList.remove('marked');
+    
+    // Check if current question is marked
+    if (answers[currentQuestionIndex].markedForReview === true) {
+        markBtn.textContent = '✓ Marked for Review';
+        markBtn.classList.add('marked');
+    } else {
+        markBtn.textContent = '🔖 Mark for Review';
+    }
+}
+
 // Save current answer
 function saveCurrentAnswer() {
     const editor = document.getElementById('code-editor');
@@ -267,26 +323,25 @@ function saveCurrentAnswer() {
 // Mark question for review
 function markForReview() {
     if (!answers[currentQuestionIndex]) {
-        console.error('Current question answer object not found');
         return;
     }
     
+    // Save current answer
     saveCurrentAnswer();
     
-    // Toggle the marked for review status
+    // Toggle the marked status
     answers[currentQuestionIndex].markedForReview = !answers[currentQuestionIndex].markedForReview;
     
-    console.log(`Question ${currentQuestionIndex + 1} marked for review:`, answers[currentQuestionIndex].markedForReview);
-    
-    // Update the button appearance
-    const btn = document.getElementById('mark-review-btn');
-    if (btn) {
-        if (answers[currentQuestionIndex].markedForReview) {
-            btn.textContent = '✓ Marked for Review';
-            btn.classList.add('marked');
+    // Immediately update the button
+    const markBtn = document.getElementById('mark-review-btn');
+    if (markBtn) {
+        markBtn.classList.remove('marked');
+        
+        if (answers[currentQuestionIndex].markedForReview === true) {
+            markBtn.textContent = '✓ Marked for Review';
+            markBtn.classList.add('marked');
         } else {
-            btn.textContent = '🔖 Mark for Review';
-            btn.classList.remove('marked');
+            markBtn.textContent = '🔖 Mark for Review';
         }
     }
     
@@ -440,9 +495,10 @@ function toggleSidebar() {
 
 // Confirm submit with dialog
 function confirmSubmit() {
-    const unansweredCount = Object.keys(answers).filter(key => !answers[key].code || answers[key].code.trim() === '').length;
+    // Count answered questions (where answered flag is true)
+    const answeredCount = Object.keys(answers).filter(key => answers[key].answered === true).length;
     const totalQuestions = currentTest.questions.length;
-    const answeredCount = totalQuestions - unansweredCount;
+    const unansweredCount = totalQuestions - answeredCount;
     
     let message = `Are you sure you want to submit the test?\n\n`;
     message += `Answered: ${answeredCount}/${totalQuestions}\n`;
@@ -652,8 +708,8 @@ async function activateCameraAndStart() {
         if (retry) {
             activateCameraAndStart();
         } else {
-            alert('Cannot proceed without camera. Redirecting to dashboard.');
-            window.location.href = 'student-dashboard.html';
+            alert('Cannot proceed without camera.');
+            window.location.href = 'index.html';
         }
     }
 }
