@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Instructions - Enduro</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .instructions-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-2xl);
+            box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.15);
+            border: 1px solid var(--border-primary);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .instructions-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 2.5rem;
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+        }
+        
+        .instructions-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .instructions-subtitle {
+            font-size: 1.125rem;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+        
+        .timer-section {
+            background: #FEF3C7;
+            border: 2px solid #FDE047;
+            padding: 1.25rem;
+            margin: 2rem 2.5rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+        }
+        
+        .timer-label {
+            font-size: 0.95rem;
+            color: #92400E;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timer-display {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #B45309;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
+        }
+        
+        .timer-message {
+            font-size: 0.875rem;
+            color: #92400E;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .instructions-content {
+            padding: 2.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .section-icon {
+            font-size: 1.75rem;
+        }
+        
+        .instructions-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2.5rem 0;
+        }
+        
+        .instruction-item {
+            display: flex;
+            gap: 1.25rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            background: #F8FAFC;
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--primary);
+            transition: all 0.2s ease;
+        }
+        
+        .instruction-item:hover {
+            background: #F1F5F9;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+        }
+        
+        .instruction-number {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        
+        .instruction-text {
+            flex: 1;
+            color: var(--text-primary);
+            font-size: 1rem;
+            line-height: 1.6;
+            padding-top: 0.25rem;
+        }
+        
+        .instruction-text strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .warning-box {
+            background: #FEE2E2;
+            border: 2px solid #FCA5A5;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .warning-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #991B1B;
+            margin-bottom: 0.75rem;
+        }
+        
+        .warning-text {
+            color: #7F1D1D;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .key-points {
+            background: #DBEAFE;
+            border: 2px solid #93C5FD;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .key-points-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1E40AF;
+            margin-bottom: 0.75rem;
+        }
+        
+        .key-points-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .key-point {
+            padding: 0.5rem 0;
+            color: #1E3A8A;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .key-point::before {
+            content: '✓';
+            color: #2563EB;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+        
+        .start-button {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .start-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(59, 130, 246, 0.4);
+        }
+        
+        .start-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .button-wrapper {
+            padding: 0 2.5rem 2.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .instructions-container {
+                margin: 1rem;
+            }
+            
+            .instructions-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .instructions-title {
+                font-size: 1.75rem;
+            }
+            
+            .instructions-content {
+                padding: 1.5rem;
+            }
+            
+            .timer-section {
+                margin: 1.5rem;
+            }
+            
+            .timer-display {
+                font-size: 2.5rem;
+            }
+            
+            .instruction-item {
+                padding: 1rem;
+            }
+            
+            .button-wrapper {
+                padding: 0 1.5rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions-container">
+        <div class="instructions-header">
+            <h1 class="instructions-title">📋 Test Instructions</h1>
+            <p class="instructions-subtitle">Please read all instructions carefully before starting the test</p>
+        </div>
+        
+        <div class="timer-section">
+            <div class="timer-label">Time Remaining to Read Instructions</div>
+            <div class="timer-display" id="countdown-timer">05:00</div>
+            <div class="timer-message" id="timer-message">Test will start automatically when timer reaches zero</div>
+        </div>
+        
+        <div class="instructions-content">
+            <div class="key-points">
+                <div class="key-points-title">
+                    <span>🎯</span>
+                    <span>Quick Summary</span>
+                </div>
+                <ul class="key-points-list">
+                    <li class="key-point"><strong>12 Questions</strong> - Try to attempt as many as possible</li>
+                    <li class="key-point"><strong>1 Hour Duration</strong> - Complete the test within 60 minutes</li>
+                    <li class="key-point"><strong>Single Attempt</strong> - Once submitted, no re-attempts allowed</li>
+                    <li class="key-point"><strong>No Going Back</strong> - Don't leave the test page</li>
+                </ul>
+            </div>
+            
+            <h2 class="section-title">
+                <span class="section-icon">📝</span>
+                <span>Important Instructions</span>
+            </h2>
+            
+            <ul class="instructions-list">
+                <li class="instruction-item">
+                    <div class="instruction-number">1</div>
+                    <div class="instruction-text">
+                        The test contains <strong>12 questions</strong> covering various Python programming concepts. Try to attempt as many questions as possible.
+                    </div>
+                </li>
+                
+                <li class="instruction-item">
+                    <div class="instruction-number">2</div>
+                    <div class="instruction-text">
+                        You have <strong>1 hour (60 minutes)</strong> to complete the test. A timer will be displayed on the test page showing the remaining time.
+                    </div>
+                </li>
+                
+                <li class="instruction-item">
+                    <div class="instruction-number">3</div>
+                    <div class="instruction-text">
+                        <strong>Once you submit the test, you cannot attempt it again.</strong> Make sure to review your answers before submitting.
+                    </div>
+                </li>
+                
+                <li class="instruction-item">
+                    <div class="instruction-number">4</div>
+                    <div class="instruction-text">
+                        After starting the test, <strong>do NOT go back, close the browser, or navigate away</strong> from the test page. Your test will not be considered valid and no further attempts will be allowed.
+                    </div>
+                </li>
+                
+                <li class="instruction-item">
+                    <div class="instruction-number">5</div>
+                    <div class="instruction-text">
+                        The only exception to the above rule is if there's an <strong>internet connectivity issue</strong>. In such cases, your attempt will be reviewed by the administrator.
+                    </div>
+                </li>
+                
+                <li class="instruction-item">
+                    <div class="instruction-number">6</div>
+                    <div class="instruction-text">
+                        Each question requires you to write Python code. Your code will be <strong>executed in real-time</strong> with test cases to verify correctness.
+                    </div>
+                </li>
+                
+                <li class="instruction-item">
+                    <div class="instruction-number">7</div>
+                    <div class="instruction-text">
+                        You can <strong>navigate between questions</strong> using the Next/Previous buttons or the question palette. Answered questions will be marked accordingly.
+                    </div>
+                </li>
+                
+                <li class="instruction-item">
+                    <div class="instruction-number">8</div>
+                    <div class="instruction-text">
+                        You can <strong>mark questions for review</strong> if you want to revisit them later. Use the "Mark for Review" button for this purpose.
+                    </div>
+                </li>
+                
+                <li class="instruction-item">
+                    <div class="instruction-number">9</div>
+                    <div class="instruction-text">
+                        Make sure you have a <strong>stable internet connection</strong> throughout the test. Save your answers periodically by moving between questions.
+                    </div>
+                </li>
+                
+                <li class="instruction-item">
+                    <div class="instruction-number">10</div>
+                    <div class="instruction-text">
+                        When you finish, click the <strong>"Submit Test"</strong> button. You will be asked to confirm before final submission.
+                    </div>
+                </li>
+            </ul>
+            
+            <div class="warning-box">
+                <div class="warning-title">
+                    <span>⚠️</span>
+                    <span>Critical Warning</span>
+                </div>
+                <div class="warning-text">
+                    <strong>Do not refresh the page, use the back button, or close the browser during the test.</strong> This will invalidate your attempt and you will not be able to retake the test unless it's verified that the issue was due to internet connectivity problems. Your test session is being monitored for fairness and integrity.
+                </div>
+            </div>
+            
+            <div class="key-points" style="background: #D1FAE5; border-color: #6EE7B7;">
+                <div class="key-points-title" style="color: #065F46;">
+                    <span>💡</span>
+                    <span>Tips for Success</span>
+                </div>
+                <ul class="key-points-list">
+                    <li class="key-point" style="color: #064E3B;">Read each question carefully before writing code</li>
+                    <li class="key-point" style="color: #064E3B;">Test your code with the provided examples</li>
+                    <li class="key-point" style="color: #064E3B;">Manage your time wisely across all questions</li>
+                    <li class="key-point" style="color: #064E3B;">Don't spend too long on any single question</li>
+                    <li class="key-point" style="color: #064E3B;">Review marked questions before submitting</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="button-wrapper">
+            <button class="start-button" id="start-button" onclick="startTest()">
+                🚀 I Understand - Start Test Now
+            </button>
+        </div>
+    </div>
+    
+    <script src="js/auth.js"></script>
+    <script>
+        // Check authentication
+        const user = getCurrentUser();
+        if (!user || user.role === 'admin') {
+            window.location.href = 'login.html';
+        }
+        
+        // Timer functionality
+        let timeRemaining = 300; // 5 minutes in seconds
+        let timerInterval;
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            const display = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('countdown-timer').textContent = display;
+            
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('timer-message').textContent = 'Starting test now...';
+                document.getElementById('countdown-timer').textContent = '00:00';
+                setTimeout(() => {
+                    startTest();
+                }, 1000);
+            } else if (timeRemaining <= 60) {
+                // Change color to red in last minute
+                document.getElementById('countdown-timer').style.color = '#DC2626';
+                document.getElementById('timer-message').textContent = 'Test starting soon!';
+            }
+            
+            timeRemaining--;
+        }
+        
+        // Start countdown
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+        
+        // Start test function
+        function startTest() {
+            clearInterval(timerInterval);
+            
+            // Get test ID from URL or use default
+            const urlParams = new URLSearchParams(window.location.search);
+            const testId = urlParams.get('testId') || '';
+            
+            // Redirect to test page
+            if (testId) {
+                window.location.href = `test.html?testId=${testId}`;
+            } else {
+                window.location.href = 'test.html';
+            }
+        }
+    </script>
+</body>
+</html>

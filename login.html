@@ -284,8 +284,8 @@
                         console.log('Redirecting to admin dashboard');
                         window.location.href = 'admin-dashboard.html';
                     } else {
-                        console.log('Redirecting to test page');
-                        window.location.href = 'test.html';
+                        console.log('Redirecting to instructions page');
+                        window.location.href = 'instructions.html';
                     }
                 }
             } catch (error) {
@@ -345,7 +345,7 @@
                 sessionStorage.setItem('currentUser', JSON.stringify({ ...userData, uid: tempUser.uid }));
                 sessionStorage.removeItem('tempUser');
                 
-                window.location.href = 'test.html';
+                window.location.href = 'instructions.html';
             } catch (error) {
                 console.error('Error creating user:', error);
                 alert('Failed to create account. Please try again.');
