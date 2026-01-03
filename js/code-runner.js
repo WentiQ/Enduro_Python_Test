@@ -336,7 +336,17 @@ function escapeHtml(text) {
 
 // Calculate final scores
 async function calculateScores(autoSubmitted, leftInMiddle = false) {
+    console.log('=== calculateScores called ===');
+    console.log('autoSubmitted:', autoSubmitted, 'leftInMiddle:', leftInMiddle);
+    
     const user = getCurrentUser();
+    console.log('Current user:', user);
+    
+    if (!user) {
+        console.error('No user found! Cannot save test attempt.');
+        alert('Error: User not found. Please login again.');
+        return;
+    }
     
     // Run all test cases one final time and store results
     const questionResults = [];
@@ -421,10 +431,35 @@ async function calculateScores(autoSubmitted, leftInMiddle = false) {
         answers: answers
     };
     
-    // Save to localStorage
+    console.log('=== Saving test attempt ===');
+    console.log('Attempt data:', attempt);
+    
+    // Save to Firebase first
+    try {
+        if (typeof window.saveTestAttemptToFirebase === 'function') {
+            console.log('Saving to Firebase...');
+            const firebaseId = await window.saveTestAttemptToFirebase(attempt);
+            console.log('Successfully saved to Firebase with ID:', firebaseId);
+            // Store the Firebase ID in the attempt object
+            attempt.firebaseId = firebaseId;
+        } else {
+            console.warn('Firebase save function not available, will save to localStorage only');
+        }
+    } catch (error) {
+        console.error('Failed to save to Firebase:', error);
+        console.log('Continuing with localStorage save...');
+    }
+    
+    // Also save to localStorage as backup
     const attempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
+    console.log('Existing attempts in localStorage before save:', attempts.length);
+    
     attempts.push(attempt);
     localStorage.setItem('testAttempts', JSON.stringify(attempts));
+    
+    console.log('Saved to localStorage! Total attempts now:', attempts.length);
+    console.log('Verification - reading back from localStorage:', 
+        JSON.parse(localStorage.getItem('testAttempts') || '[]').length);
     
     // Show results
     showResults(attempt);

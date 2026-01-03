@@ -383,6 +383,8 @@ function clearCode() {
 
 // Submit test
 function submitTest() {
+    console.log('=== submitTest called ===');
+    
     // Final warning about recording
     const finalWarning = confirm(
         '⚠️ FINAL CONFIRMATION\n\n' +
@@ -394,8 +396,11 @@ function submitTest() {
     );
     
     if (!finalWarning) {
+        console.log('User cancelled submission');
         return;
     }
+    
+    console.log('User confirmed submission, proceeding...');
     
     saveCurrentAnswer();
     stopTimer();
@@ -404,12 +409,15 @@ function submitTest() {
     stopCamera();
     stopRecordingIndicator();
     
+    console.log('Calling calculateScores...');
     // Calculate scores
     calculateScores(false);
 }
 
 // Auto-submit test when time is up
 function autoSubmitTest() {
+    console.log('=== autoSubmitTest called ===');
+    
     saveCurrentAnswer();
     
     // Stop camera and recording indicator
@@ -417,6 +425,8 @@ function autoSubmitTest() {
     stopRecordingIndicator();
     
     alert('Time is up! Your test will be submitted automatically.\n\nYour session recording will be evaluated.');
+    
+    console.log('Calling calculateScores with autoSubmit=true...');
     calculateScores(true);
 }
 

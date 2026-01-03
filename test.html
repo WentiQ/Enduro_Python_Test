@@ -87,6 +87,25 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    
+    <!-- Import Firebase functions for saving test attempts -->
+    <script type="module">
+        import { createTestAttempt } from './js/firebase-database.js';
+        
+        // Make Firebase function globally accessible for non-module scripts
+        window.saveTestAttemptToFirebase = async function(attemptData) {
+            try {
+                console.log('Attempting to save test attempt to Firebase...');
+                const docId = await createTestAttempt(attemptData);
+                console.log('Test attempt saved to Firebase with ID:', docId);
+                return docId;
+            } catch (error) {
+                console.error('Error saving test attempt to Firebase:', error);
+                throw error;
+            }
+        };
+    </script>
+    
     <script src="js/auth.js?v=10"></script>
     <script src="data/questions.js?v=10"></script>
     <script src="js/protection.js?v=10"></script>

@@ -793,20 +793,52 @@
     <script src="data/questions.js"></script>
     
     <script type="module">
+        import { getAllTestAttempts, getAllTests, getAllUsers } from './js/firebase-database.js';
+        
         let currentUser = null;
         
-        // Helper functions to work with localStorage (no authentication required)
-        function getAllUsers() {
+        // Make functions globally accessible for non-module scripts
+        window.getAllUsersData = async function() {
+            try {
+                const firebaseUsers = await getAllUsers();
+                if (firebaseUsers && firebaseUsers.length > 0) {
+                    return firebaseUsers;
+                }
+            } catch (error) {
+                console.error('Error loading from Firebase:', error);
+            }
+            // Fallback to localStorage
             return JSON.parse(localStorage.getItem('users') || '[]');
-        }
+        };
         
-        function getAllTests() {
+        window.getAllTestsData = async function() {
+            try {
+                const firebaseTests = await getAllTests();
+                if (firebaseTests && firebaseTests.length > 0) {
+                    return firebaseTests;
+                }
+            } catch (error) {
+                console.error('Error loading from Firebase:', error);
+            }
+            // Fallback to localStorage
             return JSON.parse(localStorage.getItem('tests') || '[]');
-        }
+        };
         
-        function getAllTestAttempts() {
-            return JSON.parse(localStorage.getItem('testAttempts') || '[]');
-        }
+        window.getAllTestAttemptsData = async function() {
+            try {
+                const firebaseAttempts = await getAllTestAttempts();
+                if (firebaseAttempts && firebaseAttempts.length > 0) {
+                    console.log('Loaded test attempts from Firebase:', firebaseAttempts.length);
+                    return firebaseAttempts;
+                }
+            } catch (error) {
+                console.error('Error loading from Firebase:', error);
+            }
+            // Fallback to localStorage
+            const localAttempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
+            console.log('Loaded test attempts from localStorage:', localAttempts.length);
+            return localAttempts;
+        };
         
         async function initAdminDashboard() {
             // Create default admin user
@@ -819,10 +851,10 @@
             
             document.getElementById('admin-name').textContent = currentUser.name;
             showTab('overview');
-            loadDashboardStats();
+            await loadDashboardStats();
         }
         
-        window.showTab = function(tabName) {
+        window.showTab = async function(tabName) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -840,22 +872,24 @@
             }
             
             // Add active class to clicked nav link
-            event.target.closest('.sidebar-nav-link')?.classList.add('active');
+            if (event && event.target) {
+                event.target.closest('.sidebar-nav-link')?.classList.add('active');
+            }
             
             // Load data for the tab
             if (tabName === 'overview') {
-                loadDashboardStats();
+                await loadDashboardStats();
             } else if (tabName === 'students') {
                 if (typeof window.loadStudents === 'function') {
-                    window.loadStudents();
+                    await window.loadStudents();
                 }
             } else if (tabName === 'attempts') {
                 if (typeof window.loadAttempts === 'function') {
-                    window.loadAttempts();
+                    await window.loadAttempts();
                 }
             } else if (tabName === 'tests') {
                 if (typeof window.loadTests === 'function') {
-                    window.loadTests();
+                    await window.loadTests();
                 }
             }
         };
@@ -863,17 +897,17 @@
         async function loadDashboardStats() {
             try {
                 // Load students
-                const students = getAllUsers();
+                const students = await window.getAllUsersData();
                 const studentUsers = students.filter(u => u.role === 'student');
                 document.getElementById('total-students').textContent = studentUsers.length;
                 
                 // Load attempts
-                const attempts = getAllTestAttempts();
+                const attempts = await window.getAllTestAttemptsData();
                 document.getElementById('total-attempts').textContent = attempts.length;
                 
                 // Calculate average score
                 if (attempts.length > 0) {
-                    const totalScore = attempts.reduce((sum, attempt) => sum + (attempt.score || 0), 0);
+                    const totalScore = attempts.reduce((sum, attempt) => sum + (attempt.percentage || attempt.score || 0), 0);
                     const avgScore = Math.round(totalScore / attempts.length);
                     document.getElementById('avg-score').textContent = avgScore + '%';
                 } else {
@@ -881,7 +915,7 @@
                 }
                 
                 // Load tests
-                const tests = getAllTests();
+                const tests = await window.getAllTestsData();
                 document.getElementById('total-tests').textContent = tests.length;
             } catch (error) {
                 console.error('Error loading dashboard stats:', error);

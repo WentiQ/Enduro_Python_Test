@@ -51,8 +51,8 @@ function showTab(tabName) {
 }
 
 // Load students
-function loadStudents() {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
+window.loadStudents = async function() {
+    const users = window.getAllUsersData ? await window.getAllUsersData() : JSON.parse(localStorage.getItem('users') || '[]');
     const students = users.filter(u => u.role === 'student');
     
     const container = document.getElementById('students-list');
@@ -66,6 +66,9 @@ function loadStudents() {
         `;
         return;
     }
+    
+    // Get all attempts once
+    const allAttempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
     
     container.innerHTML = `
         <div class="table-container">
@@ -82,7 +85,7 @@ function loadStudents() {
                 </thead>
                 <tbody>
                     ${students.map(student => {
-                        const attempts = getStudentAttempts(student.email);
+                        const attempts = allAttempts.filter(a => a.userEmail === student.email);
                         return `
                             <tr>
                                 <td>${student.name}</td>
@@ -98,14 +101,14 @@ function loadStudents() {
             </table>
         </div>
     `;
-}
+};
 
 // Filter students
-function filterStudents() {
+window.filterStudents = async function() {
     const searchTerm = document.getElementById('student-search').value.toLowerCase();
     const deptFilter = document.getElementById('dept-filter').value;
     
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const users = window.getAllUsersData ? await window.getAllUsersData() : JSON.parse(localStorage.getItem('users') || '[]');
     let students = users.filter(u => u.role === 'student');
     
     // Apply filters
@@ -128,6 +131,9 @@ function filterStudents() {
         return;
     }
     
+    // Get all attempts once
+    const allAttempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
+    
     container.innerHTML = `
         <div class="table-container">
             <table class="students-table">
@@ -143,7 +149,7 @@ function filterStudents() {
                 </thead>
                 <tbody>
                     ${students.map(student => {
-                        const attempts = getStudentAttempts(student.email);
+                        const attempts = allAttempts.filter(a => a.userEmail === student.email);
                         return `
                             <tr>
                                 <td>${student.name}</td>
@@ -159,21 +165,21 @@ function filterStudents() {
             </table>
         </div>
     `;
-}
+};
 
 // Get student attempts
-function getStudentAttempts(email) {
-    const attempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
+window.getStudentAttempts = async function(email) {
+    const attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
     return attempts.filter(a => a.userEmail === email);
-}
+};
 
 // Load test attempts
-function loadAttempts() {
-    const attempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
+window.loadAttempts = async function() {
+    const attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
     const container = document.getElementById('attempts-list');
     
     // Populate test filter
-    const tests = JSON.parse(localStorage.getItem('tests') || '[]');
+    const tests = window.getAllTestsData ? await window.getAllTestsData() : JSON.parse(localStorage.getItem('tests') || '[]');
     const testFilter = document.getElementById('test-filter');
     testFilter.innerHTML = '<option value="">All Tests</option>' + 
         tests.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
@@ -189,10 +195,10 @@ function loadAttempts() {
     }
     
     displayAttempts(attempts);
-}
+};
 
 // Display attempts
-function displayAttempts(attempts) {
+window.displayAttempts = function(attempts) {
     const container = document.getElementById('attempts-list');
     
     // Sort by submit time (newest first)
@@ -294,11 +300,11 @@ function displayAttempts(attempts) {
 }
 
 // Filter attempts
-function filterAttempts() {
+window.filterAttempts = async function() {
     const searchTerm = document.getElementById('attempt-search').value.toLowerCase();
     const testFilter = document.getElementById('test-filter').value;
     
-    let attempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
+    let attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
     
     // Apply filters
     if (searchTerm) {
@@ -312,11 +318,11 @@ function filterAttempts() {
         attempts = attempts.filter(a => a.testId === testFilter);
     }
     
-    displayAttempts(attempts);
-}
+    window.displayAttempts(attempts);
+};
 
 // Show attempt details
-function showAttemptDetails(attempt) {
+window.showAttemptDetails = function(attempt) {
     const modal = document.createElement('div');
     modal.className = 'modal show';
     modal.innerHTML = `
@@ -375,8 +381,8 @@ function showAttemptDetails(attempt) {
 }
 
 // Export attempts to CSV
-function exportAttempts() {
-    const attempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
+window.exportAttempts = async function() {
+    const attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
     
     if (attempts.length === 0) {
         alert('No data to export');
@@ -435,8 +441,8 @@ function exportAttempts() {
 }
 
 // Load tests
-function loadTests() {
-    const tests = JSON.parse(localStorage.getItem('tests') || '[]');
+window.loadTests = async function() {
+    const tests = window.getAllTestsData ? await window.getAllTestsData() : JSON.parse(localStorage.getItem('tests') || '[]');
     const container = document.getElementById('tests-list');
     
     if (tests.length === 0) {
@@ -477,12 +483,12 @@ function loadTests() {
 }
 
 // Show add test form
-function showAddTestForm() {
+window.showAddTestForm = function() {
     document.getElementById('add-test-form').style.display = 'block';
 }
 
 // Hide add test form
-function hideAddTestForm() {
+window.hideAddTestForm = function() {
     document.getElementById('add-test-form').style.display = 'none';
     document.getElementById('test-title').value = '';
     document.getElementById('test-desc').value = '';
@@ -492,7 +498,7 @@ function hideAddTestForm() {
 }
 
 // Save test
-function saveTest(event) {
+window.saveTest = function(event) {
     event.preventDefault();
     
     const title = document.getElementById('test-title').value;
@@ -535,7 +541,7 @@ function saveTest(event) {
 }
 
 // Edit test
-function editTest(testId) {
+window.editTest = function(testId) {
     const tests = JSON.parse(localStorage.getItem('tests') || '[]');
     const test = tests.find(t => t.id === testId);
     
@@ -634,7 +640,7 @@ function editTest(testId) {
 }
 
 // Delete test
-function deleteTest(testId) {
+window.deleteTest = function(testId) {
     if (!confirm('Are you sure you want to delete this test? This action cannot be undone.')) {
         return;
     }
@@ -647,7 +653,7 @@ function deleteTest(testId) {
 }
 
 // Reinitialize tests - force reload Enduro Python Test
-function reinitializeTests() {
+window.reinitializeTests = function() {
     if (!confirm('This will reload the Enduro Python Test with all questions. Continue?')) {
         return;
     }
