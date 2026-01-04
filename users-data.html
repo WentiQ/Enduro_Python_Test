@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Data - Enduro Platform</title>
+    <link rel="stylesheet" href="css/users-data.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="title">📊 Users Data Dashboard</h1>
+                <p class="subtitle">Comprehensive test performance data sorted by total score</p>
+            </div>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn btn-refresh">
+                    <span>🔄</span> Refresh
+                </button>
+                <button id="exportBtn" class="btn btn-export">
+                    <span>📥</span> Export CSV
+                </button>
+                <a href="index.html" class="btn btn-back">
+                    <span>🏠</span> Home
+                </a>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="totalUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Tests Taken</div>
+                <div class="stat-value" id="totalTests">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Score</div>
+                <div class="stat-value" id="avgScore">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Highest Score</div>
+                <div class="stat-value" id="highestScore">0%</div>
+            </div>
+        </div>
+
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>Loading user data from Firebase...</p>
+        </div>
+
+        <div class="error-message" id="errorMessage" style="display: none;">
+            <h3>⚠️ Error Loading Data</h3>
+            <p id="errorText"></p>
+        </div>
+
+        <div class="table-container" id="tableContainer" style="display: none;">
+            <div style="overflow-x: auto;">
+                <table class="data-table" id="dataTable">
+                    <thead id="tableHead">
+                        <tr>
+                            <th class="rank-col sticky-col">Rank</th>
+                            <th class="sticky-col">Name</th>
+                            <th>Group</th>
+                            <th>Email</th>
+                            <th>WhatsApp</th>
+                            <th>Total Score</th>
+                            <th>Start Time</th>
+                            <th>Submission Time</th>
+                            <!-- Question columns will be added dynamically -->
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/users-data.js"></script>
+</body>
+</html>
