@@ -793,7 +793,7 @@
     <script src="data/questions.js"></script>
     
     <script type="module">
-        import { getAllTestAttempts, getAllTests, getAllUsers } from './js/firebase-database.js';
+        import { getAllTestAttempts, getAllTests, getAllUsers, getUserTestAttempts } from './js/firebase-database.js';
         
         let currentUser = null;
         
@@ -808,6 +808,20 @@
                 console.error('Error loading from Firebase:', error);
             }
             // Fallback to localStorage
+            return JSON.parse(localStorage.getItem('users') || '[]');
+        };
+        
+        window.getUserTestAttemptsData = async function(userEmail) {
+            try {
+                const userAttempts = await getUserTestAttempts(userEmail);
+                if (userAttempts && userAttempts.length > 0) {
+                    return userAttempts;
+                }
+            } catch (error) {
+                console.error('Error loading user test attempts from Firebase:', error);
+            }
+            return [];
+        };
             return JSON.parse(localStorage.getItem('users') || '[]');
         };
         

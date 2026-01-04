@@ -52,7 +52,7 @@ function showTab(tabName) {
 
 // Load students
 window.loadStudents = async function() {
-    const users = window.getAllUsersData ? await window.getAllUsersData() : JSON.parse(localStorage.getItem('users') || '[]');
+    const users = window.getAllUsersData ? await window.getAllUsersData() : [];
     const students = users.filter(u => u.role === 'student');
     
     const container = document.getElementById('students-list');
@@ -68,7 +68,7 @@ window.loadStudents = async function() {
     }
     
     // Get all attempts once
-    const allAttempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
+    const allAttempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : [];
     
     container.innerHTML = `
         <div class="table-container">
@@ -81,11 +81,13 @@ window.loadStudents = async function() {
                         <th>WhatsApp</th>
                         <th>Registered Date</th>
                         <th>Tests Taken</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${students.map(student => {
                         const attempts = allAttempts.filter(a => a.userEmail === student.email);
+                        const userAttempts = student.testAttempts || [];
                         return `
                             <tr>
                                 <td>${student.name}</td>
@@ -93,7 +95,12 @@ window.loadStudents = async function() {
                                 <td>${student.department || 'N/A'}</td>
                                 <td>${student.whatsapp || 'N/A'}</td>
                                 <td>${new Date(student.createdAt).toLocaleDateString()}</td>
-                                <td>${attempts.length}</td>
+                                <td>${userAttempts.length || attempts.length}</td>
+                                <td>
+                                    <button class="btn btn-small" onclick='showUserTestAttempts(${JSON.stringify(student).replace(/'/g, "&apos;")})'>
+                                        View Attempts
+                                    </button>
+                                </td>
                             </tr>
                         `;
                     }).join('')}
@@ -108,7 +115,7 @@ window.filterStudents = async function() {
     const searchTerm = document.getElementById('student-search').value.toLowerCase();
     const deptFilter = document.getElementById('dept-filter').value;
     
-    const users = window.getAllUsersData ? await window.getAllUsersData() : JSON.parse(localStorage.getItem('users') || '[]');
+    const users = window.getAllUsersData ? await window.getAllUsersData() : [];
     let students = users.filter(u => u.role === 'student');
     
     // Apply filters
@@ -132,7 +139,7 @@ window.filterStudents = async function() {
     }
     
     // Get all attempts once
-    const allAttempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
+    const allAttempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : [];
     
     container.innerHTML = `
         <div class="table-container">
@@ -145,11 +152,13 @@ window.filterStudents = async function() {
                         <th>WhatsApp</th>
                         <th>Registered Date</th>
                         <th>Tests Taken</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${students.map(student => {
                         const attempts = allAttempts.filter(a => a.userEmail === student.email);
+                        const userAttempts = student.testAttempts || [];
                         return `
                             <tr>
                                 <td>${student.name}</td>
@@ -157,7 +166,12 @@ window.filterStudents = async function() {
                                 <td>${student.department || 'N/A'}</td>
                                 <td>${student.whatsapp || 'N/A'}</td>
                                 <td>${new Date(student.createdAt).toLocaleDateString()}</td>
-                                <td>${attempts.length}</td>
+                                <td>${userAttempts.length || attempts.length}</td>
+                                <td>
+                                    <button class="btn btn-small" onclick='showUserTestAttempts(${JSON.stringify(student).replace(/'/g, "&apos;")})'>
+                                        View Attempts
+                                    </button>
+                                </td>
                             </tr>
                         `;
                     }).join('')}
@@ -169,17 +183,17 @@ window.filterStudents = async function() {
 
 // Get student attempts
 window.getStudentAttempts = async function(email) {
-    const attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
+    const attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : [];
     return attempts.filter(a => a.userEmail === email);
 };
 
 // Load test attempts
 window.loadAttempts = async function() {
-    const attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
+    const attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : [];
     const container = document.getElementById('attempts-list');
     
     // Populate test filter
-    const tests = window.getAllTestsData ? await window.getAllTestsData() : JSON.parse(localStorage.getItem('tests') || '[]');
+    const tests = window.getAllTestsData ? await window.getAllTestsData() : [];
     const testFilter = document.getElementById('test-filter');
     testFilter.innerHTML = '<option value="">All Tests</option>' + 
         tests.map(t => `<option value="${t.id}">${t.title}</option>`).join('');
@@ -304,7 +318,7 @@ window.filterAttempts = async function() {
     const searchTerm = document.getElementById('attempt-search').value.toLowerCase();
     const testFilter = document.getElementById('test-filter').value;
     
-    let attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
+    let attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : [];
     
     // Apply filters
     if (searchTerm) {
@@ -380,9 +394,95 @@ window.showAttemptDetails = function(attempt) {
     };
 }
 
+// Show user test attempts from user collection
+window.showUserTestAttempts = function(student) {
+    const testAttempts = student.testAttempts || [];
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal show';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 900px; max-height: 85vh; overflow-y: auto;">
+            <h2>Test Attempts - ${student.name}</h2>
+            
+            <div class="results-breakdown">
+                <h3>Student Information</h3>
+                <p><strong>Name:</strong> ${student.name}</p>
+                <p><strong>Email:</strong> ${student.email}</p>
+                <p><strong>Department:</strong> ${student.department || 'N/A'}</p>
+                <p><strong>Group:</strong> ${student.group || 'N/A'}</p>
+                <p><strong>WhatsApp:</strong> ${student.whatsapp || 'N/A'}</p>
+            </div>
+            
+            ${testAttempts.length === 0 ? `
+                <div class="empty-state" style="padding: 3rem; text-align: center;">
+                    <div class="empty-state-icon" style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                    <div class="empty-state-text" style="color: #666;">No test attempts found</div>
+                </div>
+            ` : `
+                <div class="results-breakdown">
+                    <h3>Test Attempts (${testAttempts.length})</h3>
+                    ${testAttempts.map((attempt, idx) => `
+                        <div class="test-attempt-card" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid ${attempt.percentage >= 70 ? '#28a745' : attempt.percentage >= 40 ? '#ffc107' : '#dc3545'};">
+                            <h4 style="margin-top: 0; color: #2d3748;">${attempt.testTitle}</h4>
+                            <p><strong>Date:</strong> ${new Date(attempt.attemptDate).toLocaleString()}</p>
+                            <p><strong>Score:</strong> ${attempt.totalScore}/${attempt.maxScore} (${attempt.percentage}%)</p>
+                            
+                            <details style="margin-top: 1rem;">
+                                <summary style="cursor: pointer; font-weight: 600; padding: 0.5rem; background: white; border-radius: 4px;">
+                                    View Question-wise Scores
+                                </summary>
+                                <div style="padding: 1rem; background: white; margin-top: 0.5rem; border-radius: 4px;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <thead style="background: #e9ecef;">
+                                            <tr>
+                                                <th style="padding: 0.75rem; text-align: left; border: 1px solid #dee2e6;">Question</th>
+                                                <th style="padding: 0.75rem; text-align: center; border: 1px solid #dee2e6;">Score</th>
+                                                <th style="padding: 0.75rem; text-align: center; border: 1px solid #dee2e6;">Test Cases</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${attempt.questionScores
+                                                .sort((a, b) => (a.originalIndex || a.questionNumber - 1) - (b.originalIndex || b.questionNumber - 1))
+                                                .map(q => {
+                                                    const displayNum = (q.originalIndex !== undefined ? q.originalIndex : q.questionNumber - 1) + 1;
+                                                    const scorePercent = (q.score / q.maxScore) * 100;
+                                                    const scoreColor = scorePercent === 100 ? '#28a745' : scorePercent >= 50 ? '#ffc107' : '#dc3545';
+                                                    return `
+                                                        <tr>
+                                                            <td style="padding: 0.75rem; border: 1px solid #dee2e6;">Question ${displayNum}</td>
+                                                            <td style="padding: 0.75rem; text-align: center; border: 1px solid #dee2e6; color: ${scoreColor}; font-weight: 600;">
+                                                                ${q.score}/${q.maxScore}
+                                                            </td>
+                                                            <td style="padding: 0.75rem; text-align: center; border: 1px solid #dee2e6;">
+                                                                ${q.totalTestCases > 0 ? `${q.passedTestCases}/${q.totalTestCases}` : 'N/A'}
+                                                            </td>
+                                                        </tr>
+                                                    `;
+                                                }).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+                        </div>
+                    `).join('')}
+                </div>
+            `}
+            
+            <button onclick="this.parentElement.parentElement.remove()" class="btn btn-primary" style="margin-top: 1rem;">
+                Close
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
+}
+
 // Export attempts to CSV
 window.exportAttempts = async function() {
-    const attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : JSON.parse(localStorage.getItem('testAttempts') || '[]');
+    const attempts = window.getAllTestAttemptsData ? await window.getAllTestAttemptsData() : [];
     
     if (attempts.length === 0) {
         alert('No data to export');

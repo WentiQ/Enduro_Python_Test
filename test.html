@@ -90,9 +90,9 @@
     
     <!-- Import Firebase functions for saving test attempts -->
     <script type="module">
-        import { createTestAttempt } from './js/firebase-database.js';
+        import { createTestAttempt, checkUserHasAttemptedTest, getAllTests, addTestAttemptToUser } from './js/firebase-database.js';
         
-        // Make Firebase function globally accessible for non-module scripts
+        // Make Firebase functions globally accessible for non-module scripts
         window.saveTestAttemptToFirebase = async function(attemptData) {
             try {
                 console.log('Attempting to save test attempt to Firebase...');
@@ -102,6 +102,45 @@
             } catch (error) {
                 console.error('Error saving test attempt to Firebase:', error);
                 throw error;
+            }
+        };
+        
+        // Add test attempt to user collection
+        window.addTestAttemptToUserCollection = async function(userEmail, attemptData) {
+            try {
+                console.log('Adding test attempt to user collection...');
+                await addTestAttemptToUser(userEmail, attemptData);
+                console.log('Test attempt added to user collection successfully');
+                return true;
+            } catch (error) {
+                console.error('Error adding test attempt to user collection:', error);
+                throw error;
+            }
+        };
+        
+        // Check if user has already attempted a test
+        window.checkUserHasAttemptedTestFirebase = async function(userEmail, testId) {
+            try {
+                console.log('Checking Firebase for existing attempt...');
+                const hasAttempted = await checkUserHasAttemptedTest(userEmail, testId);
+                console.log('Firebase check result:', hasAttempted);
+                return hasAttempted;
+            } catch (error) {
+                console.error('Error checking test attempt in Firebase:', error);
+                return false;
+            }
+        };
+        
+        // Load all tests from Firebase
+        window.getAllTestsFromFirebase = async function() {
+            try {
+                console.log('Loading tests from Firebase...');
+                const tests = await getAllTests();
+                console.log('Firebase tests loaded:', tests.length);
+                return tests;
+            } catch (error) {
+                console.error('Error loading tests from Firebase:', error);
+                return [];
             }
         };
     </script>

@@ -450,6 +450,17 @@ async function calculateScores(autoSubmitted, leftInMiddle = false) {
         console.log('Continuing with localStorage save...');
     }
     
+    // Save test attempt to user collection
+    try {
+        if (typeof window.addTestAttemptToUserCollection === 'function') {
+            console.log('Saving test attempt to user collection...');
+            await window.addTestAttemptToUserCollection(user.email, attempt);
+            console.log('Successfully saved test attempt to user collection');
+        }
+    } catch (error) {
+        console.error('Failed to save test attempt to user collection:', error);
+    }
+    
     // Also save to localStorage as backup
     const attempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
     console.log('Existing attempts in localStorage before save:', attempts.length);

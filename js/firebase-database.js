@@ -38,6 +38,73 @@ export async function updateUser(uid, data) {
     }
 }
 
+export async function addTestAttemptToUser(userEmail, attemptData) {
+    try {
+        // First, find the user document by email
+        const q = query(collection(db, 'users'), where('email', '==', userEmail));
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) {
+            console.error('User not found with email:', userEmail);
+            return false;
+        }
+        
+        const userDoc = snapshot.docs[0];
+        const userId = userDoc.id;
+        
+        // Get existing attempts or initialize empty array
+        const userData = userDoc.data();
+        const existingAttempts = userData.testAttempts || [];
+        
+        // Add new attempt to the array
+        existingAttempts.push({
+            testId: attemptData.testId,
+            testTitle: attemptData.testTitle,
+            attemptDate: attemptData.submitTime,
+            totalScore: attemptData.totalScore,
+            maxScore: attemptData.maxScore,
+            percentage: attemptData.percentage,
+            questionScores: attemptData.questionScores.map(qs => ({
+                questionNumber: qs.questionNumber,
+                originalIndex: qs.originalIndex,
+                score: qs.score,
+                maxScore: qs.maxScore,
+                passedTestCases: qs.passedTestCases || 0,
+                totalTestCases: qs.totalTestCases || 0
+            }))
+        });
+        
+        // Update the user document
+        await updateDoc(doc(db, 'users', userId), {
+            testAttempts: existingAttempts,
+            updatedAt: serverTimestamp()
+        });
+        
+        console.log('Test attempt added to user collection successfully');
+        return true;
+    } catch (error) {
+        console.error('Error adding test attempt to user:', error);
+        return false;
+    }
+}
+
+export async function getUserTestAttempts(userEmail) {
+    try {
+        const q = query(collection(db, 'users'), where('email', '==', userEmail));
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) {
+            return [];
+        }
+        
+        const userData = snapshot.docs[0].data();
+        return userData.testAttempts || [];
+    } catch (error) {
+        console.error('Error getting user test attempts:', error);
+        return [];
+    }
+}
+
 // ============== TESTS ==============
 
 export async function createTest(testData) {
@@ -71,20 +138,11 @@ export async function getAllTests() {
     try {
         const testsSnapshot = await getDocs(collection(db, 'tests'));
         const firebaseTests = testsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // If no tests in Firebase, fall back to localStorage
-        if (firebaseTests.length === 0) {
-            console.log('No tests in Firebase, checking localStorage...');
-            const localTests = JSON.parse(localStorage.getItem('tests') || '[]');
-            return localTests;
-        }
-        
+        console.log('Loaded tests from Firebase:', firebaseTests.length);
         return firebaseTests;
     } catch (error) {
-        console.error('Error getting tests from Firebase, falling back to localStorage:', error);
-        // Fallback to localStorage
-        const localTests = JSON.parse(localStorage.getItem('tests') || '[]');
-        return localTests;
+        console.error('Error getting tests from Firebase:', error);
+        return [];
     }
 }
 
@@ -144,20 +202,11 @@ export async function getTestAttemptsByUser(userEmail) {
         const q = query(collection(db, 'testAttempts'), where('userEmail', '==', userEmail));
         const snapshot = await getDocs(q);
         const firebaseAttempts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // If no attempts in Firebase, fall back to localStorage
-        if (firebaseAttempts.length === 0) {
-            console.log('No attempts in Firebase, checking localStorage...');
-            const localAttempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
-            return localAttempts.filter(a => a.userEmail === userEmail);
-        }
-        
+        console.log('Loaded user attempts from Firebase:', firebaseAttempts.length);
         return firebaseAttempts;
     } catch (error) {
-        console.error('Error getting test attempts from Firebase, falling back to localStorage:', error);
-        // Fallback to localStorage
-        const localAttempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
-        return localAttempts.filter(a => a.userEmail === userEmail);
+        console.error('Error getting test attempts from Firebase:', error);
+        return [];
     }
 }
 
@@ -176,20 +225,11 @@ export async function getAllTestAttempts() {
     try {
         const attemptsSnapshot = await getDocs(collection(db, 'testAttempts'));
         const firebaseAttempts = attemptsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // If no attempts in Firebase, fall back to localStorage
-        if (firebaseAttempts.length === 0) {
-            console.log('No attempts in Firebase, checking localStorage...');
-            const localAttempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
-            return localAttempts;
-        }
-        
+        console.log('Loaded all test attempts from Firebase:', firebaseAttempts.length);
         return firebaseAttempts;
     } catch (error) {
-        console.error('Error getting all test attempts from Firebase, falling back to localStorage:', error);
-        // Fallback to localStorage
-        const localAttempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
-        return localAttempts;
+        console.error('Error getting all test attempts from Firebase:', error);
+        return [];
     }
 }
 
@@ -242,19 +282,12 @@ export async function checkUserHasAttemptedTest(userEmail, testId) {
             where('testId', '==', testId)
         );
         const snapshot = await getDocs(q);
-        
-        if (snapshot.empty) {
-            // Check localStorage as fallback
-            const localAttempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
-            return localAttempts.some(a => a.userEmail === userEmail && a.testId === testId);
-        }
-        
-        return !snapshot.empty;
+        const hasAttempted = !snapshot.empty;
+        console.log(`User ${userEmail} has attempted test ${testId}:`, hasAttempted);
+        return hasAttempted;
     } catch (error) {
-        console.error('Error checking test attempt in Firebase, checking localStorage:', error);
-        // Fallback to localStorage
-        const localAttempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
-        return localAttempts.some(a => a.userEmail === userEmail && a.testId === testId);
+        console.error('Error checking test attempt in Firebase:', error);
+        return false;
     }
 }
 

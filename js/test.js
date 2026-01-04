@@ -8,7 +8,7 @@ let mediaStream = null;
 let cameraActive = false;
 
 // Initialize test
-function initTest() {
+async function initTest() {
     // Check authentication
     const user = getCurrentUser();
     if (!user || user.role === 'admin') {
@@ -22,7 +22,16 @@ function initTest() {
     
     // If no testId provided, try to load the first available test
     if (!testId) {
-        const tests = JSON.parse(localStorage.getItem('tests') || '[]');
+        // Load tests from Firebase first
+        let tests = [];
+        if (typeof window.getAllTestsFromFirebase === 'function') {
+            tests = await window.getAllTestsFromFirebase();
+        }
+        
+        // Fallback to localStorage if Firebase returns empty
+        if (tests.length === 0) {
+            tests = JSON.parse(localStorage.getItem('tests') || '[]');
+        }
         
         // Find first active test
         const now = new Date();
@@ -59,7 +68,7 @@ function initTest() {
     }
     
     // Load test
-    currentTest = loadTest(testId);
+    currentTest = await loadTest(testId);
     if (!currentTest) {
         alert('Test not found');
         window.location.href = 'login.html';
@@ -85,9 +94,11 @@ function initTest() {
         return;
     }
     
-    // Check if already attempted
-    const attempts = JSON.parse(localStorage.getItem('testAttempts') || '[]');
-    const alreadyAttempted = attempts.some(a => a.userEmail === user.email && a.testId === testId);
+    // Check if already attempted - Use Firebase
+    let alreadyAttempted = false;
+    if (typeof window.checkUserHasAttemptedTestFirebase === 'function') {
+        alreadyAttempted = await window.checkUserHasAttemptedTestFirebase(user.email, testId);
+    }
     
     if (alreadyAttempted) {
         alert('You have already attempted this test.');
@@ -149,8 +160,18 @@ function initTest() {
 }
 
 // Load test from storage
-function loadTest(testId) {
-    const tests = JSON.parse(localStorage.getItem('tests') || '[]');
+async function loadTest(testId) {
+    // Try loading from Firebase first
+    let tests = [];
+    if (typeof window.getAllTestsFromFirebase === 'function') {
+        tests = await window.getAllTestsFromFirebase();
+    }
+    
+    // Fallback to localStorage if Firebase returns empty
+    if (tests.length === 0) {
+        tests = JSON.parse(localStorage.getItem('tests') || '[]');
+    }
+    
     let test = tests.find(t => t.id === testId);
     
     // If no tests found, use default test
